@@ -1,0 +1,77 @@
+from datetime import datetime, timedelta
+from passlib.context import CryptContext
+from jose import jwt
+from uuid import UUID
+
+from app.domain.dto.auth_dto import RegisterAthleteDTO, RegisterBusinessDTO, RegisterAdminDTO, LoginDTO
+from app.domain.repo_interface.user_repository import UserRepository
+from app.domain.repo_interface.profile_repository import ProfileRepository
+from app.domain.entity.user import User
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+class AuthService:
+    def __init__(self, users: UserRepository, profiles: ProfileRepository, jwt_secret: str, jwt_exp_minutes: int = 60):
+        self._users = users
+        self._profiles = profiles
+        self._secret = jwt_secret
+        self._exp = jwt_exp_minutes
+
+    def _hash(self, pw: str) -> str:
+        return pwd_context.hash(pw)
+
+    def _verify(self, pw: str, hashed: str) -> bool:
+        return pwd_context.verify(pw, hashed)
+
+    def _token(self, user: User) -> str:
+        payload = {
+            "sub": str(user.id),
+            "role": user.role,
+            "email": user.email,
+            "exp": datetime.utcnow() + timedelta(minutes=self._exp),
+        }
+        return jwt.encode(payload, self._secret, algorithm="HS256")
+
+    async def register_athlete(self, data: RegisterAthleteDTO) -> str:
+        existing = await self._users.get_by_email(data.email)
+        if existing:
+            raise ValueError("Email already registered")
+
+        role = "ATHLETE_VIP" if data.is_vip else "ATHLETE"
+        user = await self._users.create(data.email, self._hash(data.password), role)
+        await self._profiles.create_athlete_profile(user.id)
+        return self._token(user)
+
+    async def register_business(self, data: RegisterBusinessDTO) -> str:
+        existing = await self._users.get_by_email(data.email)
+        if existing:
+            raise ValueError("Email already registered")
+
+        user = await self._users.create(data.email, self._hash(data.password), "BUSINESS")
+        await self._profiles.create_business_profile_pending(user.id)
+        return self._token(user)
+
+    async def register_admin(self, data: RegisterAdminDTO) -> str:
+        existing = await self._users.get_by_email(data.email)
+        if existing:
+            raise ValueError("Email already registered")
+
+        user = await self._users.create(data.email, self._hash(data.password), "ADMIN")
+        await self._profiles.create_admin_profile(user.id)
+        return self._token(user)
+
+    async def login(self, data: LoginDTO, get_password_hash_by_email) -> str:
+        # get_password_hash_by_email lo implementamos en repo_impl por simplicidad,
+        # o si prefieres, añádelo al UserRepository.
+        user = await self._users.get_by_email(data.email)
+        if not user:
+            raise ValueError("Invalid credentials")
+
+        hashed = await get_password_hash_by_email(data.email)
+        if not self._verify(data.password, hashed):
+            raise ValueError("Invalid credentials")
+
+        if not user.is_active:
+            raise ValueError("User is inactive")
+
+        return self._token(user)

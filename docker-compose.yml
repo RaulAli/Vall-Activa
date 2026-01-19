@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: crudslab_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fastapi_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fastapi_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  fastapi:
+    build:
+      context: ./services/python
+    container_name: crudslab_fastapi
+    environment:
+      APP_PORT: "3050"
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/fastapi_db
+      PYTHONPATH: /app
+      JWT_SECRET: "super-dev-secret"
+
+    ports:
+      - "3050:3050"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: crudslab_frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - fastapi
+
+volumes:
+  db_data:
