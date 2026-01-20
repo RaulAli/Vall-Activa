@@ -50,7 +50,15 @@ export default function BusinessDashboard() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 overflow-hidden">
-                    <h2 className="text-xl font-bold text-slate-900 mb-6">Mis Ofertas</h2>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-xl font-bold text-slate-900">Mis Ofertas</h2>
+                        <button
+                            onClick={() => navigate("/business/offers")}
+                            className="text-indigo-600 text-sm font-black hover:underline px-3 py-1 bg-indigo-50 rounded-lg"
+                        >
+                            Gestionar →
+                        </button>
+                    </div>
                     {oLoading ? (
                         <div className="space-y-4">
                             {[1, 2].map(i => <div key={i} className="h-16 bg-slate-50 animate-pulse rounded-xl" />)}

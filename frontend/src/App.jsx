@@ -19,6 +19,7 @@ import OffersListPage from "./pages/OffersListPage";
 import OfferDetailPage from "./pages/OfferDetailPage";
 import OfferCreatePage from "./pages/OfferCreatePage";
 import OfferEditPage from "./pages/OfferEditPage";
+import ManageOffersPage from "./pages/ManageOffersPage";
 
 import AthleteLoginPage from "./pages/AthleteLoginPage";
 import AthleteRegisterPage from "./pages/AthleteRegisterPage";
@@ -61,6 +62,14 @@ export default function App() {
           element={
             <RequireRole allow={["BUSINESS"]}>
               <BusinessDashboard />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/business/offers"
+          element={
+            <RequireRole allow={["BUSINESS"]}>
+              <ManageOffersPage />
             </RequireRole>
           }
         />

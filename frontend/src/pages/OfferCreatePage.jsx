@@ -17,7 +17,6 @@ export default function OfferCreatePage() {
         setError(null);
         try {
             const created = await mutations.offers.create(values);
-            // Support both direct object and { data: ... } response structures
             const newId = created?.id || created?.data?.id;
             if (newId) {
                 navigate(`/offers/${newId}`);
@@ -32,24 +31,30 @@ export default function OfferCreatePage() {
     }
 
     return (
-        <div style={{ padding: 16, display: "grid", gap: 12 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <h2>Nueva oferta</h2>
-                <Link to="/offers">← Volver</Link>
+        <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">Nueva Oferta</h1>
+                    <p className="text-slate-500 text-sm mt-1">Comparte una nueva promoción con la comunidad.</p>
+                </div>
+                <Link to="/business/dashboard" className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-bold transition-all">
+                    ← Cancelar
+                </Link>
             </div>
 
             {error && (
-                <div className="card" style={{ padding: 12, backgroundColor: "#fee", color: "crimson" }}>
-                    Error: {String(error.message || error)}
+                <div className="p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 flex items-center gap-3">
+                    <span className="text-xl">⚠️</span>
+                    <p className="text-sm font-medium">{String(error.message || error)}</p>
                 </div>
             )}
 
-            <div className="card" style={{ padding: 16 }}>
+            <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 md:p-10">
                 <OfferForm
                     initialValues={{ business_id: businessIdParam }}
                     onSubmit={handleCreate}
                     submitting={saving}
-                    submitText="Crear oferta"
+                    submitText="Publicar Oferta"
                     businessIdLocked={!!businessIdParam}
                 />
             </div>

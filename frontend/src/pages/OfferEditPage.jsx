@@ -1,20 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useApp } from "../context/Provider";
+import OfferForm from "../features/offers/components/OfferForm";
 
 export default function OfferEditPage() {
     const { id } = useParams();
     const { queries, mutations } = useApp();
     const navigate = useNavigate();
 
-    const [form, setForm] = useState(null);
+    const [offer, setOffer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
-
-    const required = ["business_id", "title", "description", "category", "region", "city", "price", "start_date", "end_date"];
-    const isValid =
-        form && required.every((k) => String(form[k] ?? "").trim().length > 0);
 
     useEffect(() => {
         let cancelled = false;
@@ -23,12 +20,7 @@ export default function OfferEditPage() {
             setError(null);
             try {
                 const o = await queries.offers.get(id);
-                if (!cancelled) {
-                    setForm({
-                        ...o,
-                        price: o.price ?? "",
-                    });
-                }
+                if (!cancelled) setOffer(o);
             } catch (e) {
                 if (!cancelled) setError(e);
             } finally {
@@ -41,65 +33,55 @@ export default function OfferEditPage() {
         };
     }, [id, queries]);
 
-    async function onSubmit(e) {
-        e.preventDefault();
-        if (!isValid) {
-            setError(new Error("Rellena todos los campos obligatorios."));
-            return;
-        }
-
+    async function handleUpdate(values) {
         setSaving(true);
         setError(null);
-
         try {
-            const payload = {
-                ...form,
-                price: Number(form.price),
-            };
-            await mutations.offers.update(id, payload);
+            await mutations.offers.update(id, values);
             navigate(`/offers/${id}`);
-        } catch (e2) {
-            setError(e2);
+        } catch (e) {
+            setError(e);
         } finally {
             setSaving(false);
         }
     }
 
+    if (loading) return (
+        <div className="py-20 text-center">
+            <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-slate-500 font-medium">Cargando oferta...</p>
+        </div>
+    );
+
     return (
-        <div style={{ padding: 16, display: "grid", gap: 12 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <h2>Editar oferta</h2>
-                <Link to={`/offers/${id}`}>← Volver</Link>
+        <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">Editar Oferta</h1>
+                    <p className="text-slate-500 text-sm mt-1">Actualiza los detalles de tu promoción.</p>
+                </div>
+                <Link to={`/offers/${id}`} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-bold transition-all">
+                    ← Cancelar
+                </Link>
             </div>
 
-            {loading && <p>Cargando...</p>}
-            {error && <p style={{ color: "crimson" }}>{String(error.message || error)}</p>}
+            {error && (
+                <div className="p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 flex items-center gap-3">
+                    <span className="text-xl">⚠️</span>
+                    <p className="text-sm font-medium">{String(error.message || error)}</p>
+                </div>
+            )}
 
-            {!loading && !error && form && (
-                <form onSubmit={onSubmit} className="card" style={{ padding: 12, display: "grid", gap: 10 }}>
-                    <input placeholder="Business ID *" value={form.business_id || ""} onChange={(e) => setForm((f) => ({ ...f, business_id: e.target.value }))} />
-                    <input placeholder="Título *" value={form.title || ""} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />
-                    <textarea placeholder="Descripción *" value={form.description || ""} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} rows={4} />
-                    <input placeholder="Categoría *" value={form.category || ""} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))} />
-                    <input placeholder="Región *" value={form.region || ""} onChange={(e) => setForm((f) => ({ ...f, region: e.target.value }))} />
-                    <input placeholder="Ciudad *" value={form.city || ""} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} />
-                    <input placeholder="Precio *" value={form.price ?? ""} onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))} />
-                    <input type="date" value={form.start_date || ""} onChange={(e) => setForm((f) => ({ ...f, start_date: e.target.value }))} />
-                    <input type="date" value={form.end_date || ""} onChange={(e) => setForm((f) => ({ ...f, end_date: e.target.value }))} />
-
-                    <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                        <input
-                            type="checkbox"
-                            checked={!!form.is_active}
-                            onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))}
-                        />
-                        Activa
-                    </label>
-
-                    <button type="submit" disabled={!isValid || saving}>
-                        {saving ? "Guardando..." : "Guardar cambios"}
-                    </button>
-                </form>
+            {offer && (
+                <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 md:p-10">
+                    <OfferForm
+                        initialValues={offer}
+                        onSubmit={handleUpdate}
+                        submitting={saving}
+                        submitText="Guardar Cambios"
+                        businessIdLocked={true}
+                    />
+                </div>
             )}
         </div>
     );

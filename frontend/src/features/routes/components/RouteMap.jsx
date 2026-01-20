@@ -7,29 +7,26 @@ export default function RouteMap({ route, track }) {
     const center = start || end || [40.4168, -3.7038]; // Madrid fallback
 
     return (
-        <div className="card" style={{ padding: 12 }}>
-            <h3>Mapa</h3>
-            <div style={{ height: 420 }}>
-                <MapContainer center={center} zoom={12} style={{ height: "100%", width: "100%" }}>
-                    <TileLayer
-                        attribution='&copy; OpenStreetMap contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
+        <div className="w-full h-[500px] overflow-hidden rounded-[1.8rem]">
+            <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%", zIndex: 1 }}>
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
 
-                    {track && <GeoJSON data={track} />}
+                {track && <GeoJSON data={track} style={{ color: '#4f46e5', weight: 5, opacity: 0.8 }} />}
 
-                    {start && (
-                        <Marker position={start}>
-                            <Popup>Inicio</Popup>
-                        </Marker>
-                    )}
-                    {end && (
-                        <Marker position={end}>
-                            <Popup>Final</Popup>
-                        </Marker>
-                    )}
-                </MapContainer>
-            </div>
+                {start && (
+                    <Marker position={start}>
+                        <Popup>Punto de Inicio</Popup>
+                    </Marker>
+                )}
+                {end && (
+                    <Marker position={end}>
+                        <Popup>Punto Final</Popup>
+                    </Marker>
+                )}
+            </MapContainer>
         </div>
     );
 }
