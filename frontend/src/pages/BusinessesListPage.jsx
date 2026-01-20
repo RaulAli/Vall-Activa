@@ -4,13 +4,15 @@ import { useApp } from "../context/Provider";
 import BusinessesTable from "../features/businesses/components/BusinessesTable";
 
 export default function BusinessesListPage() {
-    const { queries } = useApp();
+    const { session, queries } = useApp();
+    const token = session?.token;
 
     const [filters, setFilters] = useState({
         q: "",
         category: "",
         region: "",
         city: "",
+        status: "",
     });
 
     const [data, setData] = useState([]);
@@ -24,7 +26,7 @@ export default function BusinessesListPage() {
             setLoading(true);
             setError(null);
             try {
-                const items = await queries.businesses.list(filters);
+                const items = await queries.businesses.list(filters, token);
                 if (!cancelled) setData(items || []);
             } catch (e) {
                 if (!cancelled) setError(e);
@@ -37,7 +39,7 @@ export default function BusinessesListPage() {
         return () => {
             cancelled = true;
         };
-    }, [queries, filters.q, filters.category, filters.region, filters.city]);
+    }, [queries, filters, token]);
 
     return (
         <div style={{ padding: 16, display: "grid", gap: 12 }}>
@@ -67,6 +69,15 @@ export default function BusinessesListPage() {
                     value={filters.city}
                     onChange={(e) => setFilters((f) => ({ ...f, city: e.target.value }))}
                 />
+                <select
+                    value={filters.status}
+                    onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
+                >
+                    <option value="">(todos los estados)</option>
+                    <option value="PENDING">Pendientes</option>
+                    <option value="APPROVED">Aprobados</option>
+                    <option value="REJECTED">Rechazados</option>
+                </select>
             </div>
 
             {loading && <p>Cargando...</p>}

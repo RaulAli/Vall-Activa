@@ -8,3 +8,4 @@ class BusinessFiltersDTO:
     category: str | None = None
     region: str | None = None
     city: str | None = None
+    status: str | None = None

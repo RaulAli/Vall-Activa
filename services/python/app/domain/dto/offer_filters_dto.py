@@ -13,3 +13,4 @@ class OfferFiltersDTO:
     # filtros “dashboard” (via join con business)
     category: str | None = None
     region: str | None = None
+    business_status: str | None = None

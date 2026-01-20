@@ -5,6 +5,7 @@ import * as routesApi from "../services/routesApi";
 import * as businessesApi from "../services/businessesApi";
 import * as offersApi from "../services/offersApi";
 import * as authApi from "../services/authApi";
+import * as adminApi from "../services/adminApi";
 
 import { buildRoutesQueries } from "./queries/routesQueries";
 import { buildRoutesMutations } from "./commands/routesMutations";
@@ -17,6 +18,7 @@ import { buildOffersMutations } from "./commands/offersMutations";
 
 import { buildAuthQueries } from "./queries/authQueries";
 import { buildAuthMutations } from "./commands/authMutations";
+import { buildAdminMutations } from "./commands/adminMutations";
 
 const AppContext = createContext(null);
 
@@ -38,6 +40,7 @@ export function Provider({ children }) {
                 businesses: buildBusinessesMutations(businessesApi),
                 offers: buildOffersMutations(offersApi),
                 auth: buildAuthMutations(authApi),
+                admin: buildAdminMutations(adminApi),
             }
         };
     }, []);

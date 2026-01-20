@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.application.service.offer_service import OfferService
 from app.domain.dto.offer_dto import CreateOfferDTO, UpdateOfferDTO
 from app.domain.dto.offer_filters_dto import OfferFiltersDTO
-from app.infrastructure.container import get_offer_service
+from app.infrastructure.container import get_offer_service, get_optional_actor_dep
 from app.presentation.requests.offer_requests import CreateOfferRequest, UpdateOfferRequest
 from app.presentation.responses.offer_responses import OfferResponse
 
@@ -29,8 +29,16 @@ async def list_offers(
     date_to: date | None = Query(default=None),
     category: str | None = Query(default=None),
     region: str | None = Query(default=None),
+    business_status: str | None = Query(default=None),
     service: OfferService = Depends(get_offer_service),
+    actor = Depends(get_optional_actor_dep)
 ):
+    # Enforce APPROVED business status for non-admins
+    # For now we enforce it for listing. If a business owner is in their dashboard,
+    # they usually pass business_id.
+    if (not actor or actor.role != "ADMIN") and not business_id:
+        business_status = "APPROVED"
+
     filters = OfferFiltersDTO(
         q=q,
         business_id=business_id,
@@ -39,6 +47,7 @@ async def list_offers(
         date_to=date_to,
         category=category,
         region=region,
+        business_status=business_status,
     )
     items = await service.list_offers(filters)
     return [OfferResponse(**x.__dict__) for x in items]

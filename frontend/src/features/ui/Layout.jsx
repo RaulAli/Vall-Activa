@@ -21,17 +21,17 @@ export default function Layout({ children }) {
 
     // Dynamic Home/Dashboard link (Replaces Home if logged in)
     if (role === "BUSINESS") {
-        navItems.push({ label: "Mi Negocio", path: "/business/dashboard", icon: "🏢" });
+        navItems.push({ label: "Mi Negocio", path: "/business/dashboard" });
     } else if (role === "ATHLETE" || role === "ATHLETE_VIP") {
-        navItems.push({ label: "Mi Panel", path: "/athlete/dashboard", icon: "🏃" });
+        navItems.push({ label: "Mi Panel", path: "/athlete/dashboard" });
     } else {
-        navItems.push({ label: "Home", path: "/", icon: "🏠" });
+        navItems.push({ label: "Home", path: "/" });
     }
 
-    navItems.push({ label: "Tienda", path: "/shop", icon: "🛍️" });
+    navItems.push({ label: "Tienda", path: "/shop" });
 
     if (role === "ADMIN") {
-        navItems.push({ label: "Admin", path: "/admin", icon: "⚖️" });
+        navItems.push({ label: "Admin", path: "/admin" });
     }
 
     return (

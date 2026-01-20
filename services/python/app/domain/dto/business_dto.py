@@ -9,6 +9,7 @@ class CreateBusinessDTO:
     category: str
     region: str
     city: str | None
+    address: str | None
     phone: str | None
     website: str | None
     instagram: str | None
@@ -20,6 +21,7 @@ class UpdateBusinessDTO:
     category: str | None = None
     region: str | None = None
     city: str | None = None
+    address: str | None = None
     phone: str | None = None
     website: str | None = None
     instagram: str | None = None

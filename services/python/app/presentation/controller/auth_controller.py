@@ -6,7 +6,7 @@ from app.presentation.responses.auth_responses import TokenResponse, UserRespons
 from app.application.service.auth_service import AuthService
 from app.infrastructure.container import get_auth_service, get_password_hash_by_email_factory, get_actor_dep
 from app.domain.dto.auth_dto import (
-    RegisterAthleteDTO, RegisterBusinessDTO, RegisterAdminDTO, LoginDTO
+    RegisterAthleteDTO, RegisterBusinessDTO, RegisterAdminDTO, LoginDTO, BusinessDataDTO
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -15,17 +15,19 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 async def register_athlete(req: RegisterAthleteRequest, svc: AuthService = Depends(get_auth_service)):
     try:
         dto = RegisterAthleteDTO(**req.model_dump())
-        token = await svc.register_athlete(dto)
-        return TokenResponse(access_token=token)
+        token, role = await svc.register_athlete(dto)
+        return TokenResponse(access_token=token, role=role)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/business/register", response_model=TokenResponse)
 async def register_business(req: RegisterBusinessRequest, svc: AuthService = Depends(get_auth_service)):
     try:
-        dto = RegisterBusinessDTO(**req.model_dump())
-        token = await svc.register_business(dto)
-        return TokenResponse(access_token=token)
+        # Pydantic model_dump can handle nested models
+        business_data = BusinessDataDTO(**req.business.model_dump())
+        dto = RegisterBusinessDTO(email=req.email, password=req.password, business=business_data)
+        token, role = await svc.register_business(dto)
+        return TokenResponse(access_token=token, role=role)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -33,8 +35,8 @@ async def register_business(req: RegisterBusinessRequest, svc: AuthService = Dep
 async def register_admin(req: RegisterAdminRequest, svc: AuthService = Depends(get_auth_service)):
     try:
         dto = RegisterAdminDTO(**req.model_dump())
-        token = await svc.register_admin(dto)
-        return TokenResponse(access_token=token)
+        token, role = await svc.register_admin(dto)
+        return TokenResponse(access_token=token, role=role)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -43,8 +45,8 @@ async def login(req: LoginRequest, svc: AuthService = Depends(get_auth_service),
                 get_password_hash_by_email = Depends(get_password_hash_by_email_factory)):
     try:
         dto = LoginDTO(**req.model_dump())
-        token = await svc.login(dto, get_password_hash_by_email)
-        return TokenResponse(access_token=token)
+        token, role = await svc.login(dto, get_password_hash_by_email)
+        return TokenResponse(access_token=token, role=role)
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
 

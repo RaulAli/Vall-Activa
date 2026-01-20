@@ -1,6 +1,24 @@
 import { Link } from "react-router-dom";
+import { useApp } from "../../../context/Provider";
 
 export default function BusinessesTable({ items }) {
+    const { me, session, mutations } = useApp();
+    const isAdmin = me?.role === "ADMIN";
+
+    const handleAction = async (ownerId, action) => {
+        if (!window.confirm(`¿Seguro que quieres ${action === "approve" ? "aprobar" : "rechazar"} este negocio?`)) return;
+        try {
+            if (action === "approve") {
+                await mutations.admin.approveBusiness(ownerId, session.token);
+            } else {
+                await mutations.admin.rejectBusiness(ownerId, session.token);
+            }
+            window.location.reload(); // Simple way to refresh after action
+        } catch (e) {
+            alert("Error: " + e.message);
+        }
+    };
+
     if (!items?.length) return <p>No hay negocios.</p>;
 
     return (
@@ -11,6 +29,8 @@ export default function BusinessesTable({ items }) {
                     <th align="left">Categoría</th>
                     <th align="left">Región</th>
                     <th align="left">Ciudad</th>
+                    <th align="left">Estado</th>
+                    {isAdmin && <th align="left">Acciones</th>}
                 </tr>
             </thead>
             <tbody>
@@ -22,6 +42,38 @@ export default function BusinessesTable({ items }) {
                         <td>{b.category}</td>
                         <td>{b.region}</td>
                         <td>{b.city || "-"}</td>
+                        <td>
+                            <span style={{
+                                padding: "4px 8px",
+                                borderRadius: 4,
+                                fontSize: "0.8rem",
+                                background: b.status === "APPROVED" ? "#e6fffa" : b.status === "PENDING" ? "#fffaf0" : "#fff5f5",
+                                color: b.status === "APPROVED" ? "#2c7a7b" : b.status === "PENDING" ? "#b7791f" : "#c53030",
+                                fontWeight: "bold"
+                            }}>
+                                {b.status || "UNKNOWN"}
+                            </span>
+                        </td>
+                        {isAdmin && (
+                            <td style={{ display: "flex", gap: 8, padding: "8px 0" }}>
+                                {b.status !== "APPROVED" && (
+                                    <button
+                                        onClick={() => handleAction(b.owner_id, "approve")}
+                                        style={{ background: "#38a169", color: "white", border: "none", padding: "4px 8px", borderRadius: 4, cursor: "pointer", fontSize: "0.75rem" }}
+                                    >
+                                        Aprobar
+                                    </button>
+                                )}
+                                {b.status !== "REJECTED" && (
+                                    <button
+                                        onClick={() => handleAction(b.owner_id, "reject")}
+                                        style={{ background: "#e53e3e", color: "white", border: "none", padding: "4px 8px", borderRadius: 4, cursor: "pointer", fontSize: "0.75rem" }}
+                                    >
+                                        Rechazar
+                                    </button>
+                                )}
+                            </td>
+                        )}
                     </tr>
                 ))}
             </tbody>

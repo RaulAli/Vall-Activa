@@ -5,8 +5,8 @@ import { Link } from "react-router-dom";
 
 export default function ShopPage() {
     const [tab, setTab] = useState("offers"); // "offers" | "businesses"
-    const { data: businesses, loading: bLoading } = useBusinesses();
-    const { data: offers, loading: oLoading } = useOffers();
+    const { data: businesses, loading: bLoading } = useBusinesses({ status: "APPROVED" });
+    const { data: offers, loading: oLoading } = useOffers({ is_active: true, business_status: "APPROVED" });
 
     return (
         <div className="space-y-8">

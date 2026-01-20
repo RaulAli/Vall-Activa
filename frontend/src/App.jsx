@@ -65,9 +65,25 @@ export default function App() {
           }
         />
         {/* Management routes */}
+        <Route
+          path="/businesses"
+          element={
+            <RequireRole allow={["ADMIN"]}>
+              <BusinessesListPage />
+            </RequireRole>
+          }
+        />
         <Route path="/businesses/new" element={<BusinessCreatePage />} />
         <Route path="/businesses/:id" element={<BusinessDetailPage />} />
         <Route path="/businesses/:id/edit" element={<BusinessEditPage />} />
+        <Route
+          path="/offers"
+          element={
+            <RequireRole allow={["ADMIN"]}>
+              <OffersListPage />
+            </RequireRole>
+          }
+        />
         <Route path="/offers/new" element={<OfferCreatePage />} />
         <Route path="/offers/:id" element={<OfferDetailPage />} />
         <Route path="/offers/:id/edit" element={<OfferEditPage />} />

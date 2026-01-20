@@ -47,8 +47,11 @@ class SqlAlchemyOfferRepository(OfferRepository):
         return model_to_entity(offer_m, business_name=business_name)
 
     async def list(self, filters: OfferFiltersDTO | None = None) -> List[Offer]:
-        stmt = select(OfferModel, BusinessModel.name).join(
-            BusinessModel, BusinessModel.id == OfferModel.business_id
+        from app.infrastructure.db.models import BusinessProfileModel
+        stmt = (
+            select(OfferModel, BusinessModel.name)
+            .join(BusinessModel, BusinessModel.id == OfferModel.business_id)
+            .outerjoin(BusinessProfileModel, BusinessModel.owner_id == BusinessProfileModel.user_id)
         )
 
         if filters:
@@ -64,6 +67,9 @@ class SqlAlchemyOfferRepository(OfferRepository):
                 stmt = stmt.where(BusinessModel.category == filters.category)
             if filters.region:
                 stmt = stmt.where(BusinessModel.region == filters.region)
+            if filters.business_status:
+                from app.infrastructure.db.models import BusinessStatus
+                stmt = stmt.where(BusinessProfileModel.status == BusinessStatus(filters.business_status))
             if filters.q:
                 q = f"%{filters.q.lower()}%"
                 stmt = stmt.where(

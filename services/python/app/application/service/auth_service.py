@@ -3,7 +3,8 @@ from passlib.context import CryptContext
 from jose import jwt
 from uuid import UUID
 
-from app.domain.dto.auth_dto import RegisterAthleteDTO, RegisterBusinessDTO, RegisterAdminDTO, LoginDTO
+from app.domain.dto.auth_dto import RegisterAthleteDTO, RegisterBusinessDTO, RegisterAdminDTO, LoginDTO, BusinessDataDTO
+from app.domain.dto.business_dto import CreateBusinessDTO
 from app.domain.repo_interface.user_repository import UserRepository
 from app.domain.repo_interface.profile_repository import ProfileRepository
 from app.domain.entity.user import User
@@ -11,9 +12,10 @@ from app.domain.entity.user import User
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class AuthService:
-    def __init__(self, users: UserRepository, profiles: ProfileRepository, jwt_secret: str, jwt_exp_minutes: int = 60):
+    def __init__(self, users: UserRepository, profiles: ProfileRepository, businesses: "BusinessRepository", jwt_secret: str, jwt_exp_minutes: int = 60):
         self._users = users
         self._profiles = profiles
+        self._businesses = businesses
         self._secret = jwt_secret
         self._exp = jwt_exp_minutes
 
@@ -32,7 +34,7 @@ class AuthService:
         }
         return jwt.encode(payload, self._secret, algorithm="HS256")
 
-    async def register_athlete(self, data: RegisterAthleteDTO) -> str:
+    async def register_athlete(self, data: RegisterAthleteDTO) -> tuple[str, str]:
         existing = await self._users.get_by_email(data.email)
         if existing:
             raise ValueError("Email already registered")
@@ -40,27 +42,42 @@ class AuthService:
         role = "ATHLETE_VIP" if data.is_vip else "ATHLETE"
         user = await self._users.create(data.email, self._hash(data.password), role)
         await self._profiles.create_athlete_profile(user.id)
-        return self._token(user)
+        return self._token(user), role
 
-    async def register_business(self, data: RegisterBusinessDTO) -> str:
+    async def register_business(self, data: RegisterBusinessDTO) -> tuple[str, str]:
         existing = await self._users.get_by_email(data.email)
         if existing:
             raise ValueError("Email already registered")
 
         user = await self._users.create(data.email, self._hash(data.password), "BUSINESS")
         await self._profiles.create_business_profile_pending(user.id)
-        return self._token(user)
+        
+        # Create the business profile immediately with the provided data
+        await self._businesses.create(CreateBusinessDTO(
+            owner_id=user.id,
+            name=data.business.name,
+            category=data.business.category,
+            region=data.business.region,
+            city=data.business.city,
+            address=data.business.address,
+            description=data.business.description,
+            phone=data.business.phone,
+            website=data.business.website,
+            instagram=None # Register doesn't have instagram yet
+        ))
+        
+        return self._token(user), "BUSINESS"
 
-    async def register_admin(self, data: RegisterAdminDTO) -> str:
+    async def register_admin(self, data: RegisterAdminDTO) -> tuple[str, str]:
         existing = await self._users.get_by_email(data.email)
         if existing:
             raise ValueError("Email already registered")
 
         user = await self._users.create(data.email, self._hash(data.password), "ADMIN")
         await self._profiles.create_admin_profile(user.id)
-        return self._token(user)
+        return self._token(user), "ADMIN"
 
-    async def login(self, data: LoginDTO, get_password_hash_by_email) -> str:
+    async def login(self, data: LoginDTO, get_password_hash_by_email) -> tuple[str, str]:
         # get_password_hash_by_email lo implementamos en repo_impl por simplicidad,
         # o si prefieres, añádelo al UserRepository.
         user = await self._users.get_by_email(data.email)
@@ -74,4 +91,4 @@ class AuthService:
         if not user.is_active:
             raise ValueError("User is inactive")
 
-        return self._token(user)
+        return self._token(user), user.role

@@ -31,18 +31,35 @@ class Actor:
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 security = HTTPBearer(auto_error=False)
 
+from fastapi import Depends, HTTPException, status
+
 async def get_actor_dep(
     creds: HTTPAuthorizationCredentials = Depends(security),
 ) -> Actor:
     if not creds:
-        raise Exception("Not authenticated")
-    payload = jwt.decode(creds.credentials, JWT_SECRET, algorithms=["HS256"])
-    return Actor(UUID(payload["sub"]), payload["role"], payload.get("email", ""))
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+    try:
+        payload = jwt.decode(creds.credentials, JWT_SECRET, algorithms=["HS256"])
+        return Actor(UUID(payload["sub"]), payload["role"], payload.get("email", ""))
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+async def get_optional_actor_dep(
+    creds: HTTPAuthorizationCredentials = Depends(security),
+) -> Actor | None:
+    if not creds:
+        return None
+    try:
+        payload = jwt.decode(creds.credentials, JWT_SECRET, algorithms=["HS256"])
+        return Actor(UUID(payload["sub"]), payload["role"], payload.get("email", ""))
+    except:
+        return None
 
 def get_auth_service(session: AsyncSession = Depends(get_session)) -> AuthService:
     users = SqlAlchemyUserRepository(session)
     profiles = SqlAlchemyProfileRepository(session)
-    return AuthService(users, profiles, jwt_secret=JWT_SECRET, jwt_exp_minutes=60)
+    businesses = SqlAlchemyBusinessRepository(session)
+    return AuthService(users, profiles, businesses, jwt_secret=JWT_SECRET, jwt_exp_minutes=60)
 
 def get_admin_service(session: AsyncSession = Depends(get_session)) -> AdminService:
     profiles = SqlAlchemyProfileRepository(session)

@@ -8,7 +8,8 @@ function pickId(obj) {
 }
 
 export default function BusinessCreatePage() {
-    const { mutations } = useApp();
+    const { session, mutations } = useApp();
+    const token = session?.token;
     const navigate = useNavigate();
 
     const [form, setForm] = useState({
@@ -39,7 +40,7 @@ export default function BusinessCreatePage() {
         setError(null);
 
         try {
-            const created = await mutations.businesses.create(form);
+            const created = await mutations.businesses.create(form, token);
 
             const newId = pickId(created);
             if (!newId) {
