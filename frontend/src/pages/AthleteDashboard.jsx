@@ -5,7 +5,7 @@ import RoutesTable from "../features/routes/components/RoutesTable";
 
 export default function AthleteDashboard() {
     const { me } = useSession();
-    const { data: routes, loading, error } = useRoutes();
+    const { data: routes, loading, error } = useRoutes({ user_id: me?.id });
     const navigate = useNavigate();
 
     return (

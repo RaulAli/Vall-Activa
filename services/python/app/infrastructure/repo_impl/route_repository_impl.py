@@ -17,6 +17,7 @@ class SqlAlchemyRouteRepository(RouteRepository):
 
     async def create(self, data: CreateRouteDTO) -> Route:
         m = RouteModel(
+            user_id=data.user_id,
             name=data.name,
             date=data.date,
             distance_km=data.distance_km,
@@ -44,6 +45,8 @@ class SqlAlchemyRouteRepository(RouteRepository):
         stmt = select(RouteModel)
 
         if filters:
+            if filters.user_id is not None:
+                stmt = stmt.where(RouteModel.user_id == filters.user_id)
             if filters.distance_km_min is not None:
                 stmt = stmt.where(RouteModel.distance_km >= filters.distance_km_min)
             if filters.distance_km_max is not None:

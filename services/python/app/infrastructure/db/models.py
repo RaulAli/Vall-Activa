@@ -2,9 +2,9 @@ import sqlalchemy as sa
 import enum
 
 from datetime import datetime
-from uuid import uuid4
+from uuid import uuid4, UUID
 from sqlalchemy import String, Boolean, DateTime, Text, Enum, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID as DB_UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from datetime import date as date_type
 
@@ -14,7 +14,7 @@ class Base(DeclarativeBase):
 class TaskModel(Base):
     __tablename__ = "tasks"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), primary_key=True, default=uuid4)
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     done: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
@@ -25,10 +25,10 @@ class TaskModel(Base):
 class RouteModel(Base):
     __tablename__ = "routes"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), primary_key=True, default=uuid4)
 
     name: Mapped[str] = mapped_column(String(200), nullable=False)
-    date: Mapped[date_type] = mapped_column(sa.Date(), nullable=False)  # <- requiere sa
+    date: Mapped[date_type] = mapped_column(sa.Date(), nullable=False)
     distance_km: Mapped[float] = mapped_column(sa.Float(), nullable=False)
     elevation_gain_m: Mapped[int] = mapped_column(sa.Integer(), nullable=False)
     total_time_min: Mapped[int] = mapped_column(sa.Integer(), nullable=False)
@@ -51,6 +51,9 @@ class RouteModel(Base):
     elevation_loss_m: Mapped[int | None] = mapped_column(sa.Integer(), nullable=True)
     min_altitude_m: Mapped[int | None] = mapped_column(sa.Integer(), nullable=True)
     max_altitude_m: Mapped[int | None] = mapped_column(sa.Integer(), nullable=True)
+ 
+    user_id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user = relationship("UserModel")
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
@@ -61,18 +64,21 @@ def touch_updated_at(model) -> None:
 class BusinessModel(Base):
     __tablename__ = "businesses"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), primary_key=True, default=uuid4)
 
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    category: Mapped[str] = mapped_column(String(100), nullable=False)  # ej: "restaurante", "tienda", etc.
+    category: Mapped[str] = mapped_column(String(100), nullable=False)
     region: Mapped[str] = mapped_column(String(200), nullable=False)
     city: Mapped[str | None] = mapped_column(String(200), nullable=True)
 
     phone: Mapped[str | None] = mapped_column(String(50), nullable=True)
     website: Mapped[str | None] = mapped_column(String(300), nullable=True)
     instagram: Mapped[str | None] = mapped_column(String(100), nullable=True)
+ 
+    owner_id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    owner = relationship("UserModel")
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
@@ -82,10 +88,10 @@ class BusinessModel(Base):
 class OfferModel(Base):
     __tablename__ = "offers"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), primary_key=True, default=uuid4)
 
-    business_id: Mapped[str] = mapped_column(
-        UUID(as_uuid=True),
+    business_id: Mapped[UUID] = mapped_column(
+        DB_UUID(as_uuid=True),
         ForeignKey("businesses.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
@@ -94,8 +100,8 @@ class OfferModel(Base):
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    discount_type: Mapped[str] = mapped_column(String(30), nullable=False)  # "percent" | "fixed" | "other"
-    discount_value: Mapped[str] = mapped_column(String(100), nullable=False)  # "10", "5€", "2x1", etc.
+    discount_type: Mapped[str] = mapped_column(String(30), nullable=False)
+    discount_value: Mapped[str] = mapped_column(String(100), nullable=False)
 
     start_date: Mapped[date_type] = mapped_column(sa.Date(), nullable=False)
     end_date: Mapped[date_type] = mapped_column(sa.Date(), nullable=False)
@@ -123,7 +129,7 @@ class BusinessStatus(str, enum.Enum):
 class UserModel(Base):
     __tablename__ = "users"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), primary_key=True, default=uuid4)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
 
@@ -141,7 +147,7 @@ class UserModel(Base):
 class AthleteProfileModel(Base):
     __tablename__ = "athlete_profiles"
 
-    user_id: Mapped[str] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
@@ -153,7 +159,7 @@ class AthleteProfileModel(Base):
 class BusinessProfileModel(Base):
     __tablename__ = "business_profiles"
 
-    user_id: Mapped[str] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
 
     status: Mapped[BusinessStatus] = mapped_column(Enum(BusinessStatus, name="business_status"), nullable=False, default=BusinessStatus.PENDING)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
@@ -167,7 +173,7 @@ class BusinessProfileModel(Base):
 class AdminProfileModel(Base):
     __tablename__ = "admin_profiles"
 
-    user_id: Mapped[str] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)

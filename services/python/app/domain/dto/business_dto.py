@@ -1,7 +1,9 @@
 from dataclasses import dataclass
+from uuid import UUID
 
 @dataclass(frozen=True)
 class CreateBusinessDTO:
+    owner_id: UUID
     name: str
     description: str | None
     category: str

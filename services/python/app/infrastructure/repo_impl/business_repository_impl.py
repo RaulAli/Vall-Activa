@@ -16,6 +16,7 @@ class SqlAlchemyBusinessRepository(BusinessRepository):
 
     async def create(self, data: CreateBusinessDTO) -> Business:
         m = BusinessModel(
+            owner_id=data.owner_id,
             name=data.name,
             description=data.description,
             category=data.category,
@@ -38,6 +39,8 @@ class SqlAlchemyBusinessRepository(BusinessRepository):
         stmt = select(BusinessModel)
 
         if filters:
+            if filters.owner_id is not None:
+                stmt = stmt.where(BusinessModel.owner_id == filters.owner_id)
             if filters.category:
                 stmt = stmt.where(BusinessModel.category == filters.category)
             if filters.region:

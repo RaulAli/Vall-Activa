@@ -7,11 +7,11 @@ import OffersTable from "../features/offers/components/OffersTable";
 export default function BusinessDashboard() {
     const { me } = useSession();
     const navigate = useNavigate();
-    const { data: businesses, loading: bLoading } = useBusinesses(); // In real app, filter by owner
-    const { data: offers, loading: oLoading } = useOffers(); // In real app, filter by owner
+    const { data: businesses, loading: bLoading } = useBusinesses({ owner_id: me?.id });
 
     // Conceptually, a business user might own multiple profiles, but usually one.
     const myBusiness = businesses?.[0];
+    const { data: offers, loading: oLoading } = useOffers({ business_id: myBusiness?.id });
 
     return (
         <div className="space-y-8">
@@ -30,7 +30,7 @@ export default function BusinessDashboard() {
                         </button>
                     )}
                     <button
-                        onClick={() => navigate("/offers/new")}
+                        onClick={() => navigate(`/offers/new?business_id=${myBusiness?.id}`)}
                         className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-100 transition-all"
                     >
                         + Nueva Oferta

@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 import datetime as dt
+from uuid import UUID
 
 @dataclass(frozen=True)
 class CreateRouteDTO:
+    user_id: UUID
     name: str
     date: dt.date
     distance_km: float

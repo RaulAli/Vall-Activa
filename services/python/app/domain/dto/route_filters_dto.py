@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 import datetime as dt
+from uuid import UUID
 
 @dataclass(frozen=True)
 class RouteFiltersDTO:
+    user_id: UUID | None = None
     distance_km_min: float | None = None
     distance_km_max: float | None = None
 

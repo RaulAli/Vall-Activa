@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.application.service.business_service import BusinessService
 from app.domain.dto.business_dto import CreateBusinessDTO, UpdateBusinessDTO
 from app.domain.dto.business_filters_dto import BusinessFiltersDTO
-from app.infrastructure.container import get_business_service
+from app.infrastructure.container import get_business_service, get_actor_dep
 from app.presentation.requests.business_requests import CreateBusinessRequest, UpdateBusinessRequest
 from app.presentation.responses.business_responses import BusinessResponse
 
@@ -14,20 +14,22 @@ router = APIRouter(prefix="/businesses", tags=["businesses"])
 async def create_business(
     body: CreateBusinessRequest,
     service: BusinessService = Depends(get_business_service),
+    actor = Depends(get_actor_dep)
 ):
-    dto = CreateBusinessDTO(**body.model_dump())
+    dto = CreateBusinessDTO(owner_id=actor.user_id, **body.model_dump())
     created = await service.create_business(dto)
     return BusinessResponse(**created.__dict__)
 
 @router.get("", response_model=list[BusinessResponse])
 async def list_businesses(
     q: str | None = Query(default=None),
+    owner_id: UUID | None = Query(default=None),
     category: str | None = Query(default=None),
     region: str | None = Query(default=None),
     city: str | None = Query(default=None),
     service: BusinessService = Depends(get_business_service),
 ):
-    filters = BusinessFiltersDTO(q=q, category=category, region=region, city=city)
+    filters = BusinessFiltersDTO(owner_id=owner_id, q=q, category=category, region=region, city=city)
     items = await service.list_businesses(filters)
     return [BusinessResponse(**x.__dict__) for x in items]
 

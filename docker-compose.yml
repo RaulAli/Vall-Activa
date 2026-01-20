@@ -1,7 +1,6 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: crudslab_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -19,12 +18,13 @@ services:
   fastapi:
     build:
       context: ./services/python
-    container_name: crudslab_fastapi
     environment:
       APP_PORT: "3050"
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/fastapi_db
       PYTHONPATH: /app
       JWT_SECRET: "super-dev-secret"
+    volumes:
+      - ./services/python:/app
 
     ports:
       - "3050:3050"
@@ -35,7 +35,6 @@ services:
   frontend:
     build:
       context: ./frontend
-    container_name: crudslab_frontend
     ports:
       - "5173:80"
     depends_on:
