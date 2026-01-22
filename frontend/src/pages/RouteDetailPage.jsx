@@ -99,7 +99,7 @@ export default function RouteDetailPage() {
 
                     {/* Sidebar: Actions & Info */}
                     <div className="space-y-8">
-                        <GpxUploadCard routeId={id} />
+                        {!route?.has_gpx && <GpxUploadCard routeId={id} />}
 
                         <div className="bg-indigo-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-indigo-100 relative overflow-hidden">
                             <div className="relative z-10">

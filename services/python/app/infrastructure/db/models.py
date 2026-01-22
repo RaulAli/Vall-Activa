@@ -149,12 +149,34 @@ class AthleteProfileModel(Base):
     __tablename__ = "athlete_profiles"
 
     user_id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    vac_balance: Mapped[float] = mapped_column(sa.Float(), nullable=False, default=0.0)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
 
     user = relationship("UserModel", back_populates="athlete_profile")
+    transactions = relationship("VacTransactionModel", back_populates="athlete", cascade="all, delete-orphan")
+
+
+class VacTransactionModel(Base):
+    __tablename__ = "vac_transactions"
+
+    id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), primary_key=True, default=uuid4)
+    athlete_id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("athlete_profiles.user_id", ondelete="CASCADE"), nullable=False, index=True)
+    
+    amount: Mapped[float] = mapped_column(sa.Float(), nullable=False)
+    description: Mapped[str] = mapped_column(String(255), nullable=False)
+    
+    # Optional: Link to a route if it's a reward
+    route_id: Mapped[UUID | None] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("routes.id", ondelete="SET NULL"), nullable=True)
+    
+    # Optional: Link to an offer if it's a purchase
+    offer_id: Mapped[UUID | None] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("offers.id", ondelete="SET NULL"), nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
+
+    athlete = relationship("AthleteProfileModel", back_populates="transactions")
 
 
 class BusinessProfileModel(Base):

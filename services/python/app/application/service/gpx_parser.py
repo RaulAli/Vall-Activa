@@ -66,8 +66,24 @@ def parse_gpx_and_compute(gpx_bytes: bytes) -> dict:
         delta = max(times) - min(times)
         total_time_min = int(delta.total_seconds() // 60)
 
+    start_lat = points[0][0]
+    start_lng = points[0][1]
+    end_lat = points[-1][0]
+    end_lng = points[-1][1]
+
+    # Detect if circular (start and end within ~100m)
+    dist_start_end = haversine_m(start_lat, start_lng, end_lat, end_lng)
+    is_circular = dist_start_end < 100
+
     coords = [[lon, lat] for (lat, lon, _ele) in points]
     track_geojson = {"type": "LineString", "coordinates": coords}
+
+    # Extract date from metadata or first point
+    gpx_date = None
+    if gpx.time:
+        gpx_date = gpx.time.date().isoformat()
+    elif times:
+        gpx_date = min(times).date().isoformat()
 
     return {
         "gpx_text": text,
@@ -78,4 +94,10 @@ def parse_gpx_and_compute(gpx_bytes: bytes) -> dict:
         "total_time_min": total_time_min,
         "min_altitude_m": int(round(min_alt)) if min_alt is not None else None,
         "max_altitude_m": int(round(max_alt)) if max_alt is not None else None,
+        "start_lat": start_lat,
+        "start_lng": start_lng,
+        "end_lat": end_lat,
+        "end_lng": end_lng,
+        "is_circular": is_circular,
+        "date": gpx_date,
     }

@@ -4,9 +4,9 @@ from pydantic import BaseModel, Field
 class CreateRouteRequest(BaseModel):
     name: str = Field(min_length=1, max_length=200)
     date: dt.date
-    distance_km: float = Field(ge=0)
-    elevation_gain_m: int = Field(ge=0)
-    total_time_min: int = Field(ge=0)
+    distance_km: float = Field(default=0, ge=0)
+    elevation_gain_m: int = Field(default=0, ge=0)
+    total_time_min: int = Field(default=0, ge=0)
     difficulty: int = Field(ge=1, le=5)
     region: str = Field(min_length=1, max_length=200)
     notes: str | None = Field(default=None, max_length=5000)

@@ -25,4 +25,12 @@ class RouteGpxService:
             total_time_min=result["total_time_min"],
             min_altitude_m=result["min_altitude_m"],
             max_altitude_m=result["max_altitude_m"],
+            start_lat=result["start_lat"],
+            start_lng=result["start_lng"],
+            end_lat=result["end_lat"],
+            end_lng=result["end_lng"],
+            is_circular=result["is_circular"],
         )
+
+    async def parse_gpx(self, gpx_bytes: bytes) -> dict:
+        return parse_gpx_and_compute(gpx_bytes)

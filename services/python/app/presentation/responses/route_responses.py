@@ -19,6 +19,8 @@ class RouteResponse(BaseModel):
     end_lat: float | None
     end_lng: float | None
     is_circular: bool
+    gpx_filename: str | None
+    has_gpx: bool
 
     created_at: datetime
     updated_at: datetime

@@ -25,3 +25,19 @@ async def upload_gpx(
         raise HTTPException(status_code=404, detail="Route not found")
 
     return RouteResponse(**updated.__dict__)
+@router.post("/gpx/parse", status_code=status.HTTP_200_OK)
+async def parse_gpx(
+    file: UploadFile = File(...),
+    service: RouteGpxService = Depends(get_route_gpx_service)
+):
+    if not file.filename.lower().endswith(".gpx"):
+        raise HTTPException(status_code=400, detail="Only .gpx files are allowed")
+
+    content = await file.read()
+    if not content:
+        raise HTTPException(status_code=400, detail="Empty file")
+
+    result = await service.parse_gpx(content)
+    # Remove large text content for preview response
+    result.pop("gpx_text", None)
+    return result

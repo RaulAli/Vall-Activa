@@ -78,3 +78,24 @@ export async function uploadRouteGpx(id, file, token) {
 
     return await res.json();
 }
+export async function parseRouteGpx(file, token) {
+    const form = new FormData();
+    form.append("file", file);
+
+    const res = await fetch(`${API_URL}/routes/gpx/parse`, {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        body: form,
+    });
+
+    if (!res.ok) {
+        let detail = "";
+        try {
+            const data = await res.json();
+            if (data?.detail) detail = `: ${typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail)}`;
+        } catch { }
+        throw new Error(`HTTP ${res.status} ${res.statusText}${detail}`);
+    }
+
+    return await res.json();
+}

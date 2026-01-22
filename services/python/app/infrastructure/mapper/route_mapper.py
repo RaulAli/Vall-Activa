@@ -18,6 +18,8 @@ def model_to_entity(m: RouteModel) -> Route:
         end_lat=m.end_lat,
         end_lng=m.end_lng,
         is_circular=m.is_circular,
+        gpx_filename=m.gpx_filename,
+        has_gpx=bool(m.gpx_filename),
         created_at=m.created_at,
         updated_at=m.updated_at,
     )

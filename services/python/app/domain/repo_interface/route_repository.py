@@ -23,4 +23,24 @@ class RouteRepository(ABC):
     async def delete(self, route_id: UUID) -> bool: ...
 
     @abstractmethod
+    async def update_gpx_and_stats(
+        self,
+        route_id: UUID,
+        filename: str,
+        gpx_content: str,
+        track_geojson: dict | None,
+        distance_km: float,
+        elevation_gain_m: int,
+        elevation_loss_m: int,
+        total_time_min: int,
+        min_altitude_m: int | None,
+        max_altitude_m: int | None,
+        start_lat: float | None = None,
+        start_lng: float | None = None,
+        end_lat: float | None = None,
+        end_lng: float | None = None,
+        is_circular: bool | None = None,
+    ) -> Route | None: ...
+
+    @abstractmethod
     async def get_track(self, route_id: UUID) -> dict | None: ...

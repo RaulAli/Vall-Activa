@@ -146,6 +146,11 @@ class SqlAlchemyRouteRepository(RouteRepository):
         total_time_min: int,
         min_altitude_m: int | None,
         max_altitude_m: int | None,
+        start_lat: float | None = None,
+        start_lng: float | None = None,
+        end_lat: float | None = None,
+        end_lng: float | None = None,
+        is_circular: bool | None = None,
     ) -> Route | None:
         m = await self._session.get(RouteModel, route_id)
         if not m:
@@ -160,6 +165,17 @@ class SqlAlchemyRouteRepository(RouteRepository):
         m.total_time_min = total_time_min
         m.min_altitude_m = min_altitude_m
         m.max_altitude_m = max_altitude_m
+        
+        if start_lat is not None:
+            m.start_lat = start_lat
+        if start_lng is not None:
+            m.start_lng = start_lng
+        if end_lat is not None:
+            m.end_lat = end_lat
+        if end_lng is not None:
+            m.end_lng = end_lng
+        if is_circular is not None:
+            m.is_circular = is_circular
 
         touch_updated_at(m)
         await self._session.commit()
