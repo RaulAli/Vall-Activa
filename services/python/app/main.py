@@ -7,6 +7,7 @@ from app.presentation.controller.business_controller import router as business_r
 from app.presentation.controller.offer_controller import router as offer_router
 from app.presentation.controller.auth_controller import router as auth_router
 from app.presentation.controller.admin_controller import router as admin_router
+from app.presentation.controller.athlete_controller import router as athlete_router
 
 
 app = FastAPI(title="FastAPI Clean Architecture CRUD")
@@ -37,3 +38,5 @@ app.include_router(offer_router)
 app.include_router(auth_router)
 
 app.include_router(admin_router)
+
+app.include_router(athlete_router)

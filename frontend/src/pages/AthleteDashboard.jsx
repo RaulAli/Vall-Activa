@@ -1,11 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { useRoutes } from "../features/routes/hooks/useRoutes";
 import { useSession } from "../features/auth/hooks/useSession";
+import { useAthleteProfile } from "../features/athlete/queries/useAthleteProfile";
 import RoutesTable from "../features/routes/components/RoutesTable";
 
 export default function AthleteDashboard() {
     const { me } = useSession();
-    const { data: routes, loading, error } = useRoutes({ user_id: me?.id });
+    const { data: routes, loading: loadingRoutes } = useRoutes({ user_id: me?.id });
+    const { data: profile } = useAthleteProfile();
     const navigate = useNavigate();
 
     return (
@@ -28,6 +30,12 @@ export default function AthleteDashboard() {
                     <p className="text-slate-400 text-sm font-semibold uppercase tracking-wider">Mis Rutas</p>
                     <p className="text-4xl font-black text-slate-900 mt-2">{routes?.length || 0}</p>
                 </div>
+
+                <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 p-6 rounded-2xl shadow-lg shadow-indigo-200 text-white relative overflow-hidden">
+                    <p className="text-indigo-200 text-sm font-semibold uppercase tracking-wider relative z-10">Mis Puntos VAC</p>
+                    <p className="text-4xl font-black mt-2 relative z-10">{profile?.total_vac_points || 0}</p>
+                    <div className="absolute -bottom-4 -right-4 text-9xl opacity-10 rotate-12">💎</div>
+                </div>
                 {/* Add more stats later */}
             </div>
 
@@ -36,7 +44,7 @@ export default function AthleteDashboard() {
                     <h2 className="text-xl font-bold text-slate-900">Actividad Reciente</h2>
                 </div>
                 <div className="p-2">
-                    {loading ? (
+                    {loadingRoutes ? (
                         <div className="p-8 space-y-4">
                             {[1, 2, 3].map(i => <div key={i} className="h-12 bg-slate-100 animate-pulse rounded-lg" />)}
                         </div>

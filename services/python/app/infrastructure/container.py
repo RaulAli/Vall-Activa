@@ -19,6 +19,7 @@ from app.infrastructure.repo_impl.user_repository_impl import SqlAlchemyUserRepo
 from app.infrastructure.repo_impl.profile_repository_impl import SqlAlchemyProfileRepository
 from app.application.service.auth_service import AuthService
 from app.application.service.admin_service import AdminService
+from app.application.service.athlete_service import AthleteService
 
 JWT_SECRET = os.getenv("JWT_SECRET", "dev-secret")
 
@@ -99,3 +100,7 @@ def get_business_service(session: AsyncSession = Depends(get_session)) -> Busine
 def get_offer_service(session: AsyncSession = Depends(get_session)) -> OfferService:
     repo = SqlAlchemyOfferRepository(session)
     return OfferService(repo)
+
+def get_athlete_service(session: AsyncSession = Depends(get_session)) -> AthleteService:
+    repo = SqlAlchemyProfileRepository(session)
+    return AthleteService(repo)

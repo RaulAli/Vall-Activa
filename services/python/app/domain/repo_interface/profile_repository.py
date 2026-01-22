@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 from app.domain.entity.business_profile import BusinessProfile
+from app.domain.entity.athlete_profile import AthleteProfile
 
 class ProfileRepository(ABC):
     @abstractmethod
@@ -17,3 +18,6 @@ class ProfileRepository(ABC):
 
     @abstractmethod
     async def get_business_profile(self, user_id: UUID) -> BusinessProfile | None: ...
+
+    @abstractmethod
+    async def get_athlete_profile(self, user_id: UUID) -> AthleteProfile | None: ...

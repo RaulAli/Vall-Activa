@@ -7,7 +7,7 @@ from app.domain.dto.route_dto import CreateRouteDTO, UpdateRouteDTO
 from app.domain.dto.route_filters_dto import RouteFiltersDTO
 from app.domain.entity.route import Route
 from app.domain.repo_interface.route_repository import RouteRepository
-from app.infrastructure.db.models import RouteModel
+from app.infrastructure.db.models import RouteModel, AthleteProfileModel
 from app.infrastructure.mapper.route_mapper import model_to_entity, touch_updated_at
 
 
@@ -16,6 +16,9 @@ class SqlAlchemyRouteRepository(RouteRepository):
         self._session = session
 
     async def create(self, data: CreateRouteDTO) -> Route:
+        # Calculate VAC points: 10 points per km
+        vac_points = int(data.distance_km * 10)
+        
         m = RouteModel(
             user_id=data.user_id,
             name=data.name,
@@ -31,8 +34,15 @@ class SqlAlchemyRouteRepository(RouteRepository):
             end_lat=data.end_lat,
             end_lng=data.end_lng,
             is_circular=data.is_circular,
+            vac_points=vac_points,
         )
         self._session.add(m)
+        
+        # Update athlete's total VAC points
+        athlete_profile = await self._session.get(AthleteProfileModel, data.user_id)
+        if athlete_profile:
+            athlete_profile.total_vac_points += vac_points
+        
         await self._session.commit()
         await self._session.refresh(m)
         return model_to_entity(m)
@@ -100,6 +110,8 @@ class SqlAlchemyRouteRepository(RouteRepository):
             m.date = data.date
         if data.distance_km is not None:
             m.distance_km = data.distance_km
+            # Recalculate VAC points when distance changes
+            m.vac_points = int(data.distance_km * 10)
         if data.elevation_gain_m is not None:
             m.elevation_gain_m = data.elevation_gain_m
         if data.total_time_min is not None:
@@ -165,6 +177,8 @@ class SqlAlchemyRouteRepository(RouteRepository):
         m.total_time_min = total_time_min
         m.min_altitude_m = min_altitude_m
         m.max_altitude_m = max_altitude_m
+        # Recalculate VAC points from GPX distance
+        m.vac_points = int(distance_km * 10)
         
         if start_lat is not None:
             m.start_lat = start_lat

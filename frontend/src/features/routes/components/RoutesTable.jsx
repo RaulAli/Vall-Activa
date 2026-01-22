@@ -13,6 +13,7 @@ export default function RoutesTable({ items = [] }) {
                         <th className="px-6 py-4 font-semibold text-right">Km</th>
                         <th className="px-6 py-4 font-semibold text-right">Desnivel</th>
                         <th className="px-6 py-4 font-semibold text-right">Tiempo</th>
+                        <th className="px-6 py-4 font-semibold text-right text-indigo-600">VAC</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -35,6 +36,9 @@ export default function RoutesTable({ items = [] }) {
                             </td>
                             <td className="px-6 py-5 text-right font-mono text-sm text-slate-700">
                                 {r.total_time_min} <span className="text-[10px] text-slate-400 uppercase">min</span>
+                            </td>
+                            <td className="px-6 py-5 text-right font-bold text-sm text-indigo-600">
+                                +{r.vac_points} <span className="text-[10px] uppercase">pts</span>
                             </td>
                         </tr>
                     ))}

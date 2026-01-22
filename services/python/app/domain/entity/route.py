@@ -20,5 +20,6 @@ class Route:
     is_circular: bool
     gpx_filename: str | None
     has_gpx: bool
+    vac_points: int
     created_at: datetime
     updated_at: datetime

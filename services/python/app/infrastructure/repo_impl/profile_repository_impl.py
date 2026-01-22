@@ -10,6 +10,7 @@ from app.infrastructure.db.models import (
 )
 
 from app.domain.entity.business_profile import BusinessProfile
+from app.domain.entity.athlete_profile import AthleteProfile
 from app.domain.repo_interface.profile_repository import ProfileRepository
 
 def business_model_to_entity(m: BusinessProfileModel) -> BusinessProfile:
@@ -17,6 +18,15 @@ def business_model_to_entity(m: BusinessProfileModel) -> BusinessProfile:
         user_id=m.user_id,
         status=m.status.value if hasattr(m.status, "value") else str(m.status),
         is_active=m.is_active,
+    )
+
+def athlete_model_to_entity(m: AthleteProfileModel) -> AthleteProfile:
+    return AthleteProfile(
+        user_id=m.user_id,
+        is_active=m.is_active,
+        total_vac_points=m.total_vac_points,
+        created_at=m.created_at,
+        updated_at=m.updated_at,
     )
 
 class SqlAlchemyProfileRepository(ProfileRepository):
@@ -51,3 +61,7 @@ class SqlAlchemyProfileRepository(ProfileRepository):
     async def get_business_profile(self, user_id: UUID) -> BusinessProfile | None:
         m = await self._session.get(BusinessProfileModel, user_id)
         return business_model_to_entity(m) if m else None
+
+    async def get_athlete_profile(self, user_id: UUID) -> AthleteProfile | None:
+        m = await self._session.get(AthleteProfileModel, user_id)
+        return athlete_model_to_entity(m) if m else None

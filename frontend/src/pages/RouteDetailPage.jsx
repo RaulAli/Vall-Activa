@@ -66,7 +66,7 @@ export default function RouteDetailPage() {
                     {/* Main Content: Stats & Map */}
                     <div className="lg:col-span-2 space-y-8">
                         {/* Stats Cards */}
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center">
                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Distancia</p>
                                 <p className="text-3xl font-black text-slate-900">{Number(route?.distance_km).toFixed(1)} <span className="text-sm">km</span></p>
@@ -78,6 +78,10 @@ export default function RouteDetailPage() {
                             <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center">
                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Tiempo</p>
                                 <p className="text-3xl font-black text-slate-900">{Math.floor(route?.total_time_min / 60)}h {route?.total_time_min % 60}m</p>
+                            </div>
+                            <div className="bg-gradient-to-br from-indigo-50 to-white p-6 rounded-3xl border border-indigo-100 shadow-sm text-center relative overflow-hidden">
+                                <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Recompensa</p>
+                                <p className="text-3xl font-black text-indigo-600">+{route?.vac_points} <span className="text-sm">VAC</span></p>
                             </div>
                         </div>
 

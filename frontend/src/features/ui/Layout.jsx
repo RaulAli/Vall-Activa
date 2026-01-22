@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSession, clearSession } from "../auth/hooks/useSession";
+import { VacHeaderBadge } from "../athlete/ui/VacHeaderBadge";
 
 export default function Layout({ children }) {
     const { session, me } = useSession();
@@ -117,6 +118,8 @@ export default function Layout({ children }) {
                     </button>
                     <div className="flex-1" />
                     <div className="flex items-center gap-4">
+                        {(role === "ATHLETE" || role === "ATHLETE_VIP") && <VacHeaderBadge />}
+
                         {/* Notification or Search icon placeholders */}
                         <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer hover:bg-slate-200 transition-colors">
                             🔔
