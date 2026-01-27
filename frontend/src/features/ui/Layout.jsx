@@ -33,6 +33,7 @@ export default function Layout({ children }) {
 
     if (role === "ATHLETE" || role === "ATHLETE_VIP") {
         navItems.push({ label: "Misiones", path: "/athlete/missions" });
+        navItems.push({ label: "Mis Cupones", path: "/athlete/coupons" });
     }
 
     if (role === "ADMIN") {

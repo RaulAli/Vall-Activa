@@ -81,7 +81,7 @@ export function Provider({ children }) {
         return () => {
             mounted = false;
         };
-    }, [session?.token, baseValue.queries.auth]);
+    }, [session?.token, baseValue.queries.auth, refreshTrigger]);
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

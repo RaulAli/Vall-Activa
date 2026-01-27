@@ -25,3 +25,9 @@ class OfferService:
 
     async def delete_offer(self, offer_id: UUID) -> bool:
         return await self._repo.delete(offer_id)
+
+    async def purchase_offer(self, user_id: UUID, offer_id: UUID) -> str:
+        return await self._repo.purchase(user_id, offer_id)
+
+    async def list_my_tickets(self, user_id: UUID) -> list[dict]:
+        return await self._repo.list_tickets(user_id)

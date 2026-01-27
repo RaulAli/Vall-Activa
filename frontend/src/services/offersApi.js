@@ -57,3 +57,16 @@ export async function deleteOffer(id, token) {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
 }
+
+export async function purchaseOffer(id, token) {
+    return http(`/offers/${id}/purchase`, {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+}
+
+export async function listMyTickets(token) {
+    return http(`/offers/user/tickets`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+}

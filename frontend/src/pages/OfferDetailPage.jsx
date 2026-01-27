@@ -1,18 +1,66 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useApp } from "../context/Provider";
+import { useSession } from "../features/auth/hooks/useSession";
+import { useAthleteProfile } from "../features/athlete/queries/useAthleteProfile";
 
 export default function OfferDetailPage() {
     const { id } = useParams();
-    const { queries } = useApp();
+    const navigate = useNavigate();
+    const { queries, mutations } = useApp();
+    const { session, me, refreshDashboard } = useSession();
+    const { data: profile } = useAthleteProfile();
 
     const [offer, setOffer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [purchasing, setPurchasing] = useState(false);
+
+    // Dynamic state derived from current data
+    const currentRole = me?.role || session?.role;
+    const isAthleteUser = currentRole === "ATHLETE" || currentRole === "ATHLETE_VIP";
+
+    async function handlePurchase() {
+        console.log("VAC Purchase: Clic detectado", { me, session, profile, offer, currentRole });
+
+        if (!session?.token) {
+            return navigate("/athlete/login");
+        }
+
+        // Explicit validations with alerts for immediate feedback
+        if (!isAthleteUser) {
+            return alert(`Solo los atletas pueden realizar compras. Tu rol detectado: ${currentRole || 'Ninguno'}`);
+        }
+
+        const price = offer.vac_price || 500;
+        const currentPoints = profile?.total_vac_points || 0;
+        if (currentPoints < price) {
+            return alert(`Puntos insuficientes. Necesitas ${price} VAC y tienes ${currentPoints} VAC.`);
+        }
+
+        if (offer.stock_quantity <= 0) {
+            return alert("¡Lo sentimos! Esta oferta se ha quedado sin stock.");
+        }
+
+        const ok = window.confirm(`¿Quieres canjear esta oferta por ${price} puntos VAC?`);
+        if (!ok) return;
+
+        setPurchasing(true);
+        try {
+            await mutations.offers.purchase(id, session.token);
+            alert("¡Compra realizada con éxito! Revisa tus cupones.");
+            refreshDashboard();
+            navigate("/athlete/coupons");
+        } catch (e) {
+            console.error("VAC Purchase Error:", e);
+            alert("Error al procesar la compra: " + (e.message || e));
+        } finally {
+            setPurchasing(false);
+        }
+    }
 
     useEffect(() => {
         let cancelled = false;
-
         async function load() {
             setLoading(true);
             setError(null);
@@ -25,12 +73,21 @@ export default function OfferDetailPage() {
                 if (!cancelled) setLoading(false);
             }
         }
-
         load();
-        return () => {
-            cancelled = true;
-        };
+        return () => { cancelled = true; };
     }, [id, queries]);
+
+    // Debug logging in render
+    useEffect(() => {
+        if (offer) {
+            console.log("DEBUG Render State:", {
+                userRole: currentRole,
+                profilePoints: profile?.total_vac_points,
+                offerPrice: offer.vac_price || 500,
+                offerStock: offer.stock_quantity
+            });
+        }
+    }, [currentRole, profile, offer]);
 
     if (loading) return (
         <div className="py-20 text-center">
@@ -108,20 +165,50 @@ export default function OfferDetailPage() {
                                     </div>
                                     <div className="text-right">
                                         <p className="text-xs text-indigo-400 font-black uppercase tracking-widest">Stock</p>
-                                        <p className="text-xl font-bold text-indigo-900">📦 {offer.stock_quantity ?? 10} uds</p>
+                                        <p className="text-xl font-bold text-indigo-900">📦 {offer.stock_quantity ?? 0} uds</p>
                                     </div>
                                 </div>
 
                                 <button
-                                    className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-xl shadow-indigo-100 transition-all transform hover:-translate-y-1 active:translate-y-0"
-                                    onClick={() => alert("¡Próximamente! Estamos habilitando el sistema de canje.")}
+                                    onClick={handlePurchase}
+                                    disabled={purchasing}
+                                    className={`w-full py-5 font-black rounded-2xl shadow-xl transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2 ${purchasing
+                                        ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                                        : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-100"
+                                        }`}
                                 >
-                                    Comprar con puntos VAC
+                                    {purchasing ? (
+                                        <>
+                                            <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                                            Procesando...
+                                        </>
+                                    ) : (
+                                        <>{!session?.token ? "Inicia sesión para comprar" : "Comprar con puntos VAC"}</>
+                                    )}
                                 </button>
+
+                                {profile && profile.total_vac_points < (offer.vac_price || 500) && (
+                                    <p className="text-xs text-red-500 text-center font-bold">
+                                        No tienes suficientes puntos VAC 💎
+                                    </p>
+                                )}
+
+                                {offer.stock_quantity <= 0 && (
+                                    <p className="text-xs text-red-500 text-center font-bold">
+                                        ¡Agotado! 📦
+                                    </p>
+                                )}
 
                                 <p className="text-[10px] text-indigo-400 text-center font-bold italic">
                                     * El canje es definitivo y no se devuelven los puntos.
                                 </p>
+
+                                {/* Diagnostic Overlay for developer */}
+                                <div className="p-2 border border-dashed border-indigo-200 rounded-lg bg-indigo-50/30">
+                                    <p className="text-[8px] font-mono text-indigo-400">
+                                        DEBUG: Role({currentRole || 'Guest'}) | Pts({profile?.total_vac_points || 0}) | Stock({offer.stock_quantity})
+                                    </p>
+                                </div>
                             </div>
 
                             <Link

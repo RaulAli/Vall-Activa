@@ -7,8 +7,10 @@ from app.domain.dto.offer_dto import CreateOfferDTO, UpdateOfferDTO
 from app.domain.dto.offer_filters_dto import OfferFiltersDTO
 from app.domain.entity.offer import Offer
 from app.domain.repo_interface.offer_repository import OfferRepository
-from app.infrastructure.db.models import OfferModel, BusinessModel, touch_updated_at
+from app.infrastructure.db.models import OfferModel, BusinessModel, touch_updated_at, TicketModel, TicketStatus, AthleteProfileModel
 from app.infrastructure.mapper.offer_mapper import model_to_entity
+import random
+import string
 
 class SqlAlchemyOfferRepository(OfferRepository):
     def __init__(self, session: AsyncSession):
@@ -117,3 +119,64 @@ class SqlAlchemyOfferRepository(OfferRepository):
         await self._session.delete(m)
         await self._session.commit()
         return True
+
+    async def purchase(self, user_id: UUID, offer_id: UUID) -> str:
+        # 1. Get athlete profile
+        profile = await self._session.get(AthleteProfileModel, user_id)
+        if not profile:
+            raise ValueError("Perfil de atleta no encontrado")
+
+        # 2. Get offer
+        offer = await self._session.get(OfferModel, offer_id)
+        if not offer:
+            raise ValueError("Oferta no encontrada")
+
+        # 3. Validations
+        if not offer.is_active:
+            raise ValueError("La oferta no está activa")
+        if offer.stock_quantity <= 0:
+            raise ValueError("No queda stock para esta oferta")
+        if profile.total_vac_points < offer.vac_price:
+            raise ValueError(f"Puntos insuficientes. Necesitas {offer.vac_price} VAC")
+
+        # 4. Atomic updates
+        profile.total_vac_points -= offer.vac_price
+        offer.stock_quantity -= 1
+        
+        # 5. Generate validation code
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        
+        # 6. Create ticket
+        ticket = TicketModel(
+            user_id=user_id,
+            offer_id=offer_id,
+            validation_code=code,
+            status=TicketStatus.ACTIVE
+        )
+        self._session.add(ticket)
+        
+        await self._session.commit()
+        return code
+
+    async def list_tickets(self, user_id: UUID) -> List[dict]:
+        stmt = (
+            select(TicketModel, OfferModel.title, BusinessModel.name)
+            .join(OfferModel, OfferModel.id == TicketModel.offer_id)
+            .join(BusinessModel, BusinessModel.id == OfferModel.business_id)
+            .where(TicketModel.user_id == user_id)
+            .order_by(TicketModel.created_at.desc())
+        )
+        rows = (await self._session.execute(stmt)).all()
+        
+        res = []
+        for t_m, o_title, b_name in rows:
+            res.append({
+                "id": str(t_m.id),
+                "offer_id": str(t_m.offer_id),
+                "offer_title": o_title,
+                "business_name": b_name,
+                "validation_code": t_m.validation_code,
+                "status": t_m.status,
+                "created_at": t_m.created_at.isoformat()
+            })
+        return res

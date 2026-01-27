@@ -83,3 +83,29 @@ async def delete_offer(
     if not ok:
         raise HTTPException(status_code=404, detail="Offer not found")
     return None
+
+@router.post("/{offer_id}/purchase")
+async def purchase_offer(
+    offer_id: UUID,
+    service: OfferService = Depends(get_offer_service),
+    actor = Depends(get_optional_actor_dep)
+):
+    if not actor:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    try:
+        code = await service.purchase_offer(actor.user_id, offer_id)
+        return {"validation_code": code}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/user/tickets")
+async def list_my_tickets(
+    service: OfferService = Depends(get_offer_service),
+    actor = Depends(get_optional_actor_dep)
+):
+    if not actor:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    items = await service.list_my_tickets(actor.user_id)
+    return items

@@ -24,3 +24,9 @@ class OfferRepository(ABC):
 
     @abstractmethod
     async def delete(self, offer_id: UUID) -> bool: ...
+
+    @abstractmethod
+    async def purchase(self, user_id: UUID, offer_id: UUID) -> str: ... # Returns validation_code
+
+    @abstractmethod
+    async def list_tickets(self, user_id: UUID) -> List[dict]: ...

@@ -26,6 +26,7 @@ import AthleteRegisterPage from "./pages/AthleteRegisterPage";
 import BusinessLoginPage from "./pages/BusinessLoginPage";
 import BusinessRegisterPage from "./pages/BusinessRegisterPage";
 import MissionsPage from "./pages/MissionsPage";
+import MyCouponsPage from "./pages/MyCouponsPage";
 
 import RequireRole from "./features/auth/components/RequireRole";
 
@@ -57,6 +58,14 @@ export default function App() {
           element={
             <RequireRole allow={["ATHLETE", "ATHLETE_VIP"]}>
               <MissionsPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/athlete/coupons"
+          element={
+            <RequireRole allow={["ATHLETE", "ATHLETE_VIP"]}>
+              <MyCouponsPage />
             </RequireRole>
           }
         />
