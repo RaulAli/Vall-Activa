@@ -112,10 +112,35 @@ class OfferModel(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     terms: Mapped[str | None] = mapped_column(Text, nullable=True)
 
+    vac_price: Mapped[int] = mapped_column(sa.Integer(), nullable=False, default=500)
+    stock_quantity: Mapped[int] = mapped_column(sa.Integer(), nullable=False, default=10)
+
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
 
     business = relationship("BusinessModel", back_populates="offers")
+
+class TicketStatus(str, enum.Enum):
+    ACTIVE = "ACTIVE"
+    USED = "USED"
+    EXPIRED = "EXPIRED"
+
+class TicketModel(Base):
+    __tablename__ = "tickets"
+
+    id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    offer_id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("offers.id", ondelete="CASCADE"), nullable=False, index=True)
+    
+    validation_code: Mapped[str] = mapped_column(String(20), nullable=False, unique=True)
+    status: Mapped[TicketStatus] = mapped_column(Enum(TicketStatus, name="ticket_status"), nullable=False, default=TicketStatus.ACTIVE)
+    
+    redeemed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
+
+    user = relationship("UserModel")
+    offer = relationship("OfferModel")
 
 class UserRole(str, enum.Enum):
     ADMIN = "ADMIN"

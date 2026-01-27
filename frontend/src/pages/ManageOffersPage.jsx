@@ -74,6 +74,8 @@ export default function ManageOffersPage() {
                                     <th className="px-8 py-5 font-black">Información de Oferta</th>
                                     <th className="px-8 py-5 font-black">Descuento</th>
                                     <th className="px-8 py-5 font-black">Validez</th>
+                                    <th className="px-8 py-5 font-black text-center">PRECIO (VAC)</th>
+                                    <th className="px-8 py-5 font-black text-center">STOCK</th>
                                     <th className="px-8 py-5 font-black text-center">Estado</th>
                                     <th className="px-8 py-5 font-black text-right">Acciones</th>
                                 </tr>
@@ -97,13 +99,19 @@ export default function ManageOffersPage() {
                                                 <span>{new Date(o.end_date).toLocaleDateString()}</span>
                                             </div>
                                         </td>
+                                        <td className="px-8 py-6 text-center font-black text-indigo-600">
+                                            💎 {o.vac_price}
+                                        </td>
+                                        <td className="px-8 py-6 text-center font-bold text-slate-600">
+                                            📦 {o.stock_quantity}
+                                        </td>
                                         <td className="px-8 py-6 text-center">
                                             <button
                                                 disabled={toggling === o.id}
                                                 onClick={() => toggleStatus(o)}
                                                 className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${o.is_active
-                                                        ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                                                        : "bg-slate-100 text-slate-400 hover:bg-slate-200"
+                                                    ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                                                    : "bg-slate-100 text-slate-400 hover:bg-slate-200"
                                                     }`}
                                             >
                                                 {toggling === o.id ? "..." : (o.is_active ? "Activa" : "Inactiva")}

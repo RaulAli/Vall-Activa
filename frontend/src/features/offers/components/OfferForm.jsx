@@ -14,6 +14,8 @@ export default function OfferForm({ initialValues, onSubmit, submitting, submitT
             end_date: initialValues?.end_date ?? "",
             is_active: initialValues?.is_active ?? true,
             terms: initialValues?.terms ?? "",
+            vac_price: initialValues?.vac_price ?? 500,
+            stock_quantity: initialValues?.stock_quantity ?? 10,
         }),
         [initialValues]
     );
@@ -52,6 +54,8 @@ export default function OfferForm({ initialValues, onSubmit, submitting, submitT
             end_date: values.end_date,
             is_active: Boolean(values.is_active),
             terms: values.terms.trim() || null,
+            vac_price: parseInt(values.vac_price) || 0,
+            stock_quantity: parseInt(values.stock_quantity) || 0,
         });
     }
 
@@ -138,6 +142,34 @@ export default function OfferForm({ initialValues, onSubmit, submitting, submitT
                     {touched.end_date && errors.end_date && <p className={errorClass}>{errors.end_date}</p>}
                 </div>
 
+                <div>
+                    <label className={labelClass}>Precio en Puntos (VAC)*</label>
+                    <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg">💎</span>
+                        <input
+                            type="number"
+                            className={`${inputClass} pl-12`}
+                            value={values.vac_price}
+                            onChange={(e) => setField("vac_price", e.target.value)}
+                            placeholder="Ej: 500"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label className={labelClass}>Stock Disponible*</label>
+                    <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg">📦</span>
+                        <input
+                            type="number"
+                            className={`${inputClass} pl-12`}
+                            value={values.stock_quantity}
+                            onChange={(e) => setField("stock_quantity", e.target.value)}
+                            placeholder="Ej: 10"
+                        />
+                    </div>
+                </div>
+
                 <div className="md:col-span-2 space-y-4">
                     <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                         <input
@@ -180,8 +212,8 @@ export default function OfferForm({ initialValues, onSubmit, submitting, submitT
                 type="submit"
                 disabled={!isValid || submitting}
                 className={`w-full py-4 rounded-2xl font-black text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 ${!isValid || submitting
-                        ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                        : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200"
+                    ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                    : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200"
                     }`}
             >
                 {submitting ? (

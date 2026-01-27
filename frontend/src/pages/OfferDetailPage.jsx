@@ -98,27 +98,35 @@ export default function OfferDetailPage() {
                         </div>
 
                         <div className="space-y-8">
-                            <div className="p-8 bg-indigo-50 rounded-3xl border border-indigo-100">
-                                <h3 className="text-lg font-black text-indigo-900 mb-4">¿Cómo canjear?</h3>
-                                <ul className="space-y-4">
-                                    <li className="flex gap-3 text-indigo-800 text-sm font-medium">
-                                        <span className="w-5 h-5 rounded-full bg-indigo-200 flex items-center justify-center text-[10px] font-black shrink-0">1</span>
-                                        Visita el negocio físico.
-                                    </li>
-                                    <li className="flex gap-3 text-indigo-800 text-sm font-medium">
-                                        <span className="w-5 h-5 rounded-full bg-indigo-200 flex items-center justify-center text-[10px] font-black shrink-0">2</span>
-                                        Muestra tu perfil de Vall Activa.
-                                    </li>
-                                    <li className="flex gap-3 text-indigo-800 text-sm font-medium">
-                                        <span className="w-5 h-5 rounded-full bg-indigo-200 flex items-center justify-center text-[10px] font-black shrink-0">3</span>
-                                        ¡Disfruta de tu descuento!
-                                    </li>
-                                </ul>
+                            <div className="p-8 bg-indigo-50 rounded-3xl border border-indigo-100 space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-xs text-indigo-400 font-black uppercase tracking-widest">Precio</p>
+                                        <p className="text-3xl font-black text-indigo-600 flex items-center gap-2">
+                                            <span>💎</span> {offer.vac_price || 500} <span className="text-xs opacity-60">VAC</span>
+                                        </p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-xs text-indigo-400 font-black uppercase tracking-widest">Stock</p>
+                                        <p className="text-xl font-bold text-indigo-900">📦 {offer.stock_quantity ?? 10} uds</p>
+                                    </div>
+                                </div>
+
+                                <button
+                                    className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-xl shadow-indigo-100 transition-all transform hover:-translate-y-1 active:translate-y-0"
+                                    onClick={() => alert("¡Próximamente! Estamos habilitando el sistema de canje.")}
+                                >
+                                    Comprar con puntos VAC
+                                </button>
+
+                                <p className="text-[10px] text-indigo-400 text-center font-bold italic">
+                                    * El canje es definitivo y no se devuelven los puntos.
+                                </p>
                             </div>
 
                             <Link
                                 to={`/businesses/${offer.business_id}`}
-                                className="block w-full text-center py-5 bg-slate-900 hover:bg-black text-white font-black rounded-2xl shadow-xl transition-all transform hover:-translate-y-1"
+                                className="block w-full text-center py-5 bg-white hover:bg-slate-50 text-slate-900 border-2 border-slate-100 font-black rounded-2xl transition-all"
                             >
                                 Ver Perfil del Negocio
                             </Link>

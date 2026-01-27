@@ -58,9 +58,17 @@ export default function ShopPage() {
                                     <div className="p-6">
                                         <h3 className="font-bold text-lg text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{offer.title}</h3>
                                         <p className="text-slate-500 text-sm mt-1 line-clamp-2 h-10">{offer.description}</p>
-                                        <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between text-xs text-slate-400">
-                                            <span>Hasta {new Date(offer.end_date).toLocaleDateString()}</span>
-                                            <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded">Ver más</span>
+                                        <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <span className="flex items-center gap-1 text-indigo-600 font-bold">
+                                                    <span className="text-sm">💎</span> {offer.vac_price || 500}
+                                                </span>
+                                                <span className="text-slate-300">|</span>
+                                                <span className="text-slate-500 font-medium">📦 {offer.stock_quantity ?? 10}</span>
+                                            </div>
+                                            <span className="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg font-bold group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                                Canjear
+                                            </span>
                                         </div>
                                     </div>
                                 </Link>

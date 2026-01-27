@@ -14,6 +14,8 @@ class Offer:
     end_date: date
     is_active: bool
     terms: str | None
+    vac_price: int
+    stock_quantity: int
     created_at: datetime
     updated_at: datetime
 
