@@ -15,11 +15,22 @@ export default function AthleteRegisterPage() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
 
-    const isValid = form.email && form.password && form.display_name;
+    const validateForm = () => {
+        if (!form.display_name.trim()) return "El nombre es obligatorio.";
+        if (!form.email.trim()) return "El email es obligatorio.";
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(form.email)) return "El formato del email no es válido.";
+        if (form.password.length < 8) return "La contraseña debe tener al menos 8 caracteres.";
+        return null;
+    };
 
     async function onSubmit(e) {
         e.preventDefault();
-        if (!isValid) return;
+        const validationError = validateForm();
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
 
         setSaving(true);
         setError(null);
@@ -86,7 +97,7 @@ export default function AthleteRegisterPage() {
                     )}
 
                     <button
-                        disabled={!isValid || saving}
+                        disabled={saving}
                         className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-bold rounded-2xl shadow-lg shadow-indigo-100 transition-all transform hover:-translate-y-0.5"
                     >
                         {saving ? "Creando..." : "Crear Cuenta"}

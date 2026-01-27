@@ -24,19 +24,28 @@ export default function BusinessRegisterPage() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
 
-    const required = [
-        form.email,
-        form.password,
-        form.business.name,
-        form.business.category,
-        form.business.region,
-        form.business.city,
-        form.business.address,
-    ].every((x) => String(x || "").trim().length > 0);
+    const validateForm = () => {
+        if (!form.email.trim()) return "El email es obligatorio.";
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(form.email)) return "El formato del email no es válido.";
+        if (form.password.length < 8) return "La contraseña debe tener al menos 8 caracteres.";
+
+        const businessFields = ["name", "category", "region", "city", "address"];
+        for (const field of businessFields) {
+            if (!String(form.business[field] || "").trim()) {
+                return `El campo ${field} es obligatorio.`;
+            }
+        }
+        return null;
+    };
 
     async function onSubmit(e) {
         e.preventDefault();
-        if (!required) return;
+        const validationError = validateForm();
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
 
         setSaving(true);
         setError(null);
@@ -143,7 +152,7 @@ export default function BusinessRegisterPage() {
 
                     <div className="pt-6">
                         <button
-                            disabled={!required || saving}
+                            disabled={saving}
                             className="w-full py-5 bg-slate-900 hover:bg-black disabled:bg-slate-300 text-white font-bold rounded-2xl shadow-xl transition-all transform hover:-translate-y-0.5 active:scale-[0.98]"
                         >
                             {saving ? "Creando solicitud..." : "Registrar mi Negocio"}

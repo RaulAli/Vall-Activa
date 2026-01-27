@@ -25,6 +25,7 @@ import AthleteLoginPage from "./pages/AthleteLoginPage";
 import AthleteRegisterPage from "./pages/AthleteRegisterPage";
 import BusinessLoginPage from "./pages/BusinessLoginPage";
 import BusinessRegisterPage from "./pages/BusinessRegisterPage";
+import MissionsPage from "./pages/MissionsPage";
 
 import RequireRole from "./features/auth/components/RequireRole";
 
@@ -48,6 +49,14 @@ export default function App() {
           element={
             <RequireRole allow={["ATHLETE", "ATHLETE_VIP"]}>
               <AthleteDashboard />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/athlete/missions"
+          element={
+            <RequireRole allow={["ATHLETE", "ATHLETE_VIP"]}>
+              <MissionsPage />
             </RequireRole>
           }
         />

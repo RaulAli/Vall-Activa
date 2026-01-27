@@ -48,6 +48,16 @@ export default function RouteForm({ initialValues, onSubmit, submitting, submitT
         if (!String(values[k] ?? "").trim()) errors[k] = "Obligatorio";
     }
 
+    if (values.distance_km && Number(values.distance_km) <= 0) {
+        errors.distance_km = "Debe ser mayor que 0";
+    }
+    if (values.total_time_min && Number(values.total_time_min) <= 0) {
+        errors.total_time_min = "Debe ser mayor que 0";
+    }
+    if (values.elevation_gain_m && Number(values.elevation_gain_m) < 0) {
+        errors.elevation_gain_m = "No puede ser negativo";
+    }
+
     const isValid = Object.keys(errors).length === 0;
 
     function setField(name, value) {
@@ -127,8 +137,10 @@ export default function RouteForm({ initialValues, onSubmit, submitting, submitT
                             value={values.distance_km}
                             disabled={autoFields.includes("distance_km")}
                             onChange={(e) => setField("distance_km", e.target.value)}
+                            onBlur={() => setTouched((t) => ({ ...t, distance_km: true }))}
                             placeholder="Automatizado"
                         />
+                        {touched.distance_km && errors.distance_km && <p className={errorClass}>{errors.distance_km}</p>}
                     </div>
                     <div>
                         <label className={labelClass}>Desnivel + (m)</label>
@@ -137,8 +149,10 @@ export default function RouteForm({ initialValues, onSubmit, submitting, submitT
                             value={values.elevation_gain_m}
                             disabled={autoFields.includes("elevation_gain_m")}
                             onChange={(e) => setField("elevation_gain_m", e.target.value)}
+                            onBlur={() => setTouched((t) => ({ ...t, elevation_gain_m: true }))}
                             placeholder="Automatizado"
                         />
+                        {touched.elevation_gain_m && errors.elevation_gain_m && <p className={errorClass}>{errors.elevation_gain_m}</p>}
                     </div>
                 </div>
 
@@ -150,8 +164,10 @@ export default function RouteForm({ initialValues, onSubmit, submitting, submitT
                             value={values.total_time_min}
                             disabled={autoFields.includes("total_time_min")}
                             onChange={(e) => setField("total_time_min", e.target.value)}
+                            onBlur={() => setTouched((t) => ({ ...t, total_time_min: true }))}
                             placeholder="Automatizado"
                         />
+                        {touched.total_time_min && errors.total_time_min && <p className={errorClass}>{errors.total_time_min}</p>}
                     </div>
                     <div>
                         <label className={labelClass}>Dificultad (1-5)*</label>

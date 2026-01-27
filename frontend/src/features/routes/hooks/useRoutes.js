@@ -3,7 +3,7 @@ import { useApp } from "../../../context/Provider";
 import { readSession } from "../../auth/hooks/useSession";
 
 export function useRoutes(filters) {
-    const { queries } = useApp();
+    const { queries, refreshTrigger } = useApp();
     const { token } = readSession() || {};
 
     const [data, setData] = useState([]);
@@ -26,7 +26,7 @@ export function useRoutes(filters) {
         }
         load();
         return () => (mounted = false);
-    }, [JSON.stringify(filters || {}), queries.routes, token]);
+    }, [JSON.stringify(filters || {}), queries.routes, token, refreshTrigger]);
 
     return { data, loading, error };
 }

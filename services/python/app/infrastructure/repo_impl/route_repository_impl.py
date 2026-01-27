@@ -1,6 +1,7 @@
 from uuid import UUID
+from datetime import date
 from typing import List
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.dto.route_dto import CreateRouteDTO, UpdateRouteDTO
@@ -15,9 +16,49 @@ class SqlAlchemyRouteRepository(RouteRepository):
     def __init__(self, session: AsyncSession):
         self._session = session
 
+    async def _calculate_vac_points(self, user_id: UUID, route_date: date, distance_km: float, current_vac_points: int = 0, route_id: UUID | None = None) -> int:
+        """
+        Unified logic to calculate VAC points for a route.
+        Capped base points (500/day) + Uncapped Bonuses (First route + Milestones).
+        """
+        today = date.today()
+        if route_date != today:
+            # Retention policy: if it's a past route, we keep what it has.
+            # If it's a NEW past route (current=0), it stays 0.
+            return current_vac_points
+
+        # Get existing routes for today (excluding current if updating)
+        stmt = select(RouteModel).where(
+            RouteModel.user_id == user_id,
+            RouteModel.date == today
+        )
+        if route_id:
+            stmt = stmt.where(RouteModel.id != route_id)
+            
+        res = await self._session.execute(stmt)
+        other_routes = res.scalars().all()
+        
+        dist_prev = sum(r.distance_km for r in other_routes)
+        dist_total = dist_prev + distance_km
+        
+        # A. Base Points (Capped at 500)
+        base_prev = min(dist_prev * 10, 500)
+        base_total = min(dist_total * 10, 500)
+        base_earned = base_total - base_prev
+        
+        # B. First Route Bonus (+50, Uncapped)
+        bonus_earned = 50 if not other_routes else 0
+        
+        # C. Mission Rewards (5 pts/km milestones, Uncapped)
+        mission_earned = 0
+        if dist_prev < 5 and dist_total >= 5: mission_earned += 25
+        if dist_prev < 10 and dist_total >= 10: mission_earned += 50
+        if dist_prev < 25 and dist_total >= 25: mission_earned += 125
+        
+        return int(base_earned + bonus_earned + mission_earned)
+
     async def create(self, data: CreateRouteDTO) -> Route:
-        # Calculate VAC points: 10 points per km
-        vac_points = int(data.distance_km * 10)
+        vac_points = await self._calculate_vac_points(data.user_id, data.date, data.distance_km)
         
         m = RouteModel(
             user_id=data.user_id,
@@ -108,10 +149,18 @@ class SqlAlchemyRouteRepository(RouteRepository):
             m.name = data.name
         if data.date is not None:
             m.date = data.date
-        if data.distance_km is not None:
-            m.distance_km = data.distance_km
-            # Recalculate VAC points when distance changes
-            m.vac_points = int(data.distance_km * 10)
+        new_distance = data.distance_km if data.distance_km is not None else m.distance_km
+        new_date = data.date if data.date is not None else m.date
+
+        # Recalculate points if anything relevant changed
+        if data.distance_km is not None or data.date is not None:
+            new_vac_points = await self._calculate_vac_points(m.user_id, new_date, new_distance, m.vac_points, route_id)
+            diff = new_vac_points - m.vac_points
+            if diff != 0:
+                athlete_profile = await self._session.get(AthleteProfileModel, m.user_id)
+                if athlete_profile:
+                    athlete_profile.total_vac_points += diff
+            m.vac_points = new_vac_points
         if data.elevation_gain_m is not None:
             m.elevation_gain_m = data.elevation_gain_m
         if data.total_time_min is not None:
@@ -177,8 +226,14 @@ class SqlAlchemyRouteRepository(RouteRepository):
         m.total_time_min = total_time_min
         m.min_altitude_m = min_altitude_m
         m.max_altitude_m = max_altitude_m
-        # Recalculate VAC points from GPX distance
-        m.vac_points = int(distance_km * 10)
+        # Calculate logical points
+        new_vac_points = await self._calculate_vac_points(m.user_id, m.date, distance_km, m.vac_points, route_id)
+        diff = new_vac_points - m.vac_points
+        if diff != 0:
+            athlete_profile = await self._session.get(AthleteProfileModel, m.user_id)
+            if athlete_profile:
+                athlete_profile.total_vac_points += diff
+        m.vac_points = new_vac_points
         
         if start_lat is not None:
             m.start_lat = start_lat

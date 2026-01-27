@@ -31,6 +31,10 @@ export default function Layout({ children }) {
 
     navItems.push({ label: "Tienda", path: "/shop" });
 
+    if (role === "ATHLETE" || role === "ATHLETE_VIP") {
+        navItems.push({ label: "Misiones", path: "/athlete/missions" });
+    }
+
     if (role === "ADMIN") {
         navItems.push({ label: "Admin", path: "/admin" });
     }

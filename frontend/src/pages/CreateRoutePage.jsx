@@ -8,7 +8,7 @@ import GpxDropzone from "../features/routes/components/GpxDropzone";
 import * as routesApi from "../services/routesApi";
 
 export default function CreateRoutePage() {
-    const { mutations } = useApp();
+    const { mutations, refreshDashboard } = useApp();
     const { token } = readSession() || {};
     const navigate = useNavigate();
 
@@ -58,7 +58,11 @@ export default function CreateRoutePage() {
                 await routesApi.uploadRouteGpx(created.id, gpxFile, token);
             }
 
-            navigate(`/routes/${created.id}`);
+            // Trigger global refresh so dashboard is updated when user lands there
+            refreshDashboard();
+
+            // Redirect to dashboard with success flag
+            navigate("/athlete/dashboard?success=true");
         } catch (err) {
             setError(err);
         } finally {

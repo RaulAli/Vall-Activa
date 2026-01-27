@@ -25,6 +25,9 @@ const AppContext = createContext(null);
 export function Provider({ children }) {
     const [session, setSession] = useState(() => readSession());
     const [me, setMe] = useState(null);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+    const refreshDashboard = () => setRefreshTrigger(t => t + 1);
 
     // Stable queries and mutations
     const baseValue = useMemo(() => {
@@ -50,8 +53,10 @@ export function Provider({ children }) {
         ...baseValue,
         session,
         setSession,
-        me
-    }), [baseValue, session, me]);
+        me,
+        refreshTrigger,
+        refreshDashboard
+    }), [baseValue, session, me, refreshTrigger]);
 
     useEffect(() => {
         let mounted = true;
