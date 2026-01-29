@@ -12,6 +12,8 @@ class CreateOfferRequest(BaseModel):
     end_date: date
     is_active: bool = True
     terms: str | None = Field(default=None, max_length=5000)
+    vac_price: int = Field(default=0, ge=0) 
+    stock_quantity: int = Field(default=0, ge=0)
 
 class UpdateOfferRequest(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=200)
@@ -22,3 +24,5 @@ class UpdateOfferRequest(BaseModel):
     end_date: date | None = None
     is_active: bool | None = None
     terms: str | None = Field(default=None, max_length=5000)
+    vac_price: int | None = Field(default=None, ge=0)
+    stock_quantity: int | None = Field(default=None, ge=0)

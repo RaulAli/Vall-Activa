@@ -83,7 +83,7 @@ export default function Layout({ children }) {
                                     className="p-2 hover:bg-white hover:shadow-sm rounded-xl transition-all group"
                                     title="Cerrar sesión"
                                 >
-                                    <span className="text-lg group-hover:scale-110 inline-block transition-transform">🚪</span>
+                                    <span className="text-lg group-hover:scale-110 inline-block transition-transform">Logout</span>
                                 </button>
                             </div>
                         ) : (
@@ -127,7 +127,7 @@ export default function Layout({ children }) {
 
                         {/* Notification or Search icon placeholders */}
                         <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer hover:bg-slate-200 transition-colors">
-                            🔔
+
                         </div>
                     </div>
                 </header>

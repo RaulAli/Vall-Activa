@@ -13,8 +13,8 @@ class CreateOfferDTO:
     end_date: date
     is_active: bool
     terms: str | None
-    vac_price: int = 500
-    stock_quantity: int = 10
+    vac_price: int
+    stock_quantity: int
 
 @dataclass(frozen=True)
 class UpdateOfferDTO:

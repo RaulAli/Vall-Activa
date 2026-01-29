@@ -3,26 +3,38 @@ import { useRoutes } from "../features/routes/hooks/useRoutes";
 import { useSession } from "../features/auth/hooks/useSession";
 import { useAthleteProfile } from "../features/athlete/queries/useAthleteProfile";
 import RoutesTable from "../features/routes/components/RoutesTable";
+import RouteFilters from "../features/routes/components/RouteFilters";
 import { useEffect, useState } from "react";
 
 export default function AthleteDashboard() {
     const { me } = useSession();
-    const { data: routes, loading: loadingRoutes } = useRoutes({ user_id: me?.id });
     const { data: profile } = useAthleteProfile();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [showSuccess, setShowSuccess] = useState(searchParams.get("success") === "true");
 
+    const [filters, setFilters] = useState({ q: "", region: "", distance_km_min: "", distance_km_max: "" });
+
+    const { data: filteredRoutes, loading: loadingRoutes } = useRoutes({ user_id: me?.id, ...filters });
+
+    const { data: allRoutes } = useRoutes({ user_id: me?.id });
+
     useEffect(() => {
         if (showSuccess) {
             const timer = setTimeout(() => {
                 setShowSuccess(false);
-                // Clean up URL
                 setSearchParams({});
             }, 5000);
             return () => clearTimeout(timer);
         }
     }, [showSuccess]);
+
+    const getTodayPoints = () => {
+        const today = new Date().toISOString().split('T')[0];
+        return allRoutes?.filter(r => r.date === today).reduce((acc, r) => acc + (r.vac_points || 0), 0) || 0;
+    };
+
+    const todayPoints = getTodayPoints();
 
     return (
         <div className="space-y-8">
@@ -55,7 +67,7 @@ export default function AthleteDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <p className="text-slate-400 text-sm font-semibold uppercase tracking-wider">Mis Rutas</p>
-                    <p className="text-4xl font-black text-slate-900 mt-2">{routes?.length || 0}</p>
+                    <p className="text-4xl font-black text-slate-900 mt-2">{filteredRoutes?.length || 0}</p>
                 </div>
 
                 <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 p-6 rounded-2xl shadow-lg shadow-indigo-200 text-white relative overflow-hidden md:col-span-2">
@@ -70,20 +82,16 @@ export default function AthleteDashboard() {
                         <div className="text-right">
                             <p className="text-indigo-200 text-xs font-bold uppercase tracking-widest">Actividad de hoy</p>
                             <p className="text-2xl font-black mt-1">
-                                {(() => {
-                                    const today = new Date().toISOString().split('T')[0];
-                                    return routes?.filter(r => r.date === today).reduce((acc, r) => acc + (r.vac_points || 0), 0) || 0;
-                                })()} <span className="text-sm opacity-60">/ 750</span>
+                                {todayPoints} <span className="text-sm opacity-60">/ 750</span>
                             </p>
                         </div>
                     </div>
 
-                    {/* Progress bar for daily limit */}
                     <div className="mt-8 h-3 bg-white/20 rounded-full relative z-10 overflow-hidden ring-1 ring-white/10 backdrop-blur-sm">
                         <div
                             className="h-full bg-white rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(255,255,255,0.5)]"
                             style={{
-                                width: `${Math.min(100, ((routes?.filter(r => r.date === new Date().toISOString().split('T')[0]).reduce((acc, r) => acc + (r.vac_points || 0), 0) || 0) / 750) * 100)}%`
+                                width: `${Math.min(100, (todayPoints / 750) * 100)}%`
                             }}
                         />
                     </div>
@@ -94,7 +102,7 @@ export default function AthleteDashboard() {
                 <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center">
                     <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Bonus Recogido hoy</p>
                     <div className="mt-3">
-                        {routes?.some(r => r.date === new Date().toISOString().split('T')[0]) ? (
+                        {allRoutes?.some(r => r.date === new Date().toISOString().split('T')[0]) ? (
                             <div className="flex items-center gap-2 text-emerald-600 font-bold text-lg">
                                 <span className="text-2xl">✅</span> +50 VAC
                             </div>
@@ -114,13 +122,16 @@ export default function AthleteDashboard() {
                 <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                     <h2 className="text-xl font-bold text-slate-900">Actividad Reciente</h2>
                 </div>
+
+                <RouteFilters value={filters} onChange={setFilters} />
+
                 <div className="p-2">
                     {loadingRoutes ? (
                         <div className="p-8 space-y-4">
                             {[1, 2, 3].map(i => <div key={i} className="h-12 bg-slate-100 animate-pulse rounded-lg" />)}
                         </div>
                     ) : (
-                        <RoutesTable items={routes} />
+                        <RoutesTable items={filteredRoutes} />
                     )}
                 </div>
             </section>

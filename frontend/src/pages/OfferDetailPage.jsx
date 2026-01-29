@@ -203,12 +203,6 @@ export default function OfferDetailPage() {
                                     * El canje es definitivo y no se devuelven los puntos.
                                 </p>
 
-                                {/* Diagnostic Overlay for developer */}
-                                <div className="p-2 border border-dashed border-indigo-200 rounded-lg bg-indigo-50/30">
-                                    <p className="text-[8px] font-mono text-indigo-400">
-                                        DEBUG: Role({currentRole || 'Guest'}) | Pts({profile?.total_vac_points || 0}) | Stock({offer.stock_quantity})
-                                    </p>
-                                </div>
                             </div>
 
                             <Link

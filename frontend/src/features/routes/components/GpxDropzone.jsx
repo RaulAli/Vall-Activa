@@ -7,8 +7,7 @@ export default function GpxDropzone({ file, onFile }) {
     const acceptFile = useCallback((f) => {
         setError(null);
         if (!f) return;
-        const name = (f.name || "").toLowerCase();
-        if (!name.endsWith(".gpx")) {
+        if (!f.name.toLowerCase().endsWith(".gpx")) {
             setError("Solo se permiten archivos .gpx");
             return;
         }
@@ -18,47 +17,70 @@ export default function GpxDropzone({ file, onFile }) {
     const onDrop = useCallback((e) => {
         e.preventDefault();
         setDragOver(false);
-        const f = e.dataTransfer.files?.[0];
-        acceptFile(f);
+        acceptFile(e.dataTransfer.files?.[0]);
     }, [acceptFile]);
 
     const onPick = useCallback((e) => {
-        const f = e.target.files?.[0];
-        acceptFile(f);
+        acceptFile(e.target.files?.[0]);
     }, [acceptFile]);
 
     const label = useMemo(() => {
-        if (file) return `Archivo: ${file.name}`;
-        return "Arrastra aquí tu .gpx o selecciónalo con el botón";
+        return file
+            ? `Archivo: ${file.name}`
+            : "Arrastra aquí tu archivo .gpx o selecciónalo";
     }, [file]);
 
     return (
-        <div className="card">
-            <h3>Archivo GPX</h3>
-
+        <div className="space-y-4">
             <div
                 onDragEnter={(e) => { e.preventDefault(); setDragOver(true); }}
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                 onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
                 onDrop={onDrop}
-                className={`dropzone ${dragOver ? "dropzone--over" : ""}`}
+                className={`
+                    rounded-xl
+                    border-2
+                    border-dashed
+                    p-6
+                    text-center
+                    transition
+                    cursor-pointer
+                    bg-white
+                    ${dragOver
+                        ? "border-indigo-500 bg-indigo-50"
+                        : "border-slate-300 hover:border-indigo-400"}
+                `}
             >
-                <div>{label}</div>
-                <div className="row" style={{ gap: 8, marginTop: 10 }}>
-                    <label className="btnLike">
+                <p className="text-sm text-slate-600">{label}</p>
+
+                <div className="mt-4 flex justify-center gap-3">
+                    <label className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg cursor-pointer hover:bg-indigo-700">
                         Seleccionar archivo
-                        <input type="file" accept=".gpx" onChange={onPick} style={{ display: "none" }} />
+                        <input
+                            type="file"
+                            accept=".gpx"
+                            onChange={onPick}
+                            className="hidden"
+                        />
                     </label>
 
-                    {file ? (
-                        <button type="button" className="secondary" onClick={() => onFile(null)}>
+                    {file && (
+                        <button
+                            type="button"
+                            onClick={() => onFile(null)}
+                            className="px-4 py-2 text-sm font-semibold text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-100"
+                        >
                             Quitar
                         </button>
-                    ) : null}
+                    )}
                 </div>
             </div>
 
-            {error ? <div className="error">{error}</div> : null}
+            {error && (
+                <p className="text-sm font-semibold text-red-600">
+                    {error}
+                </p>
+            )}
         </div>
     );
 }

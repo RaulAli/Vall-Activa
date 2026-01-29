@@ -126,9 +126,9 @@ export default function BusinessDetailPage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="w-full gap-8">
                 {/* Details Card */}
-                <div className="lg:col-span-2 space-y-8">
+                <div className="w-full space-y-8">
                     <section className="bg-white rounded-3xl p-8 md:p-10 shadow-sm border border-slate-100">
                         <h2 className="text-2xl font-black text-slate-900 mb-6 flex items-center gap-3">
                             Sobre el negocio
@@ -178,19 +178,6 @@ export default function BusinessDetailPage() {
                             </div>
                         )}
                     </section>
-                </div>
-
-                {/* Sidebar / Info */}
-                <div className="space-y-8">
-                    <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-8 text-white shadow-xl shadow-indigo-100">
-                        <h3 className="text-xl font-black mb-4">¿Te gusta este negocio?</h3>
-                        <p className="opacity-90 mb-6 text-sm leading-relaxed font-medium">
-                            Apoya a los comercios locales de Vall d'Uixó y aprovecha sus mejores ofertas por ser parte de la comunidad Vall Activa.
-                        </p>
-                        <button className="w-full py-4 bg-white text-indigo-600 font-black rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
-                            ¡Guardar en favoritos!
-                        </button>
-                    </div>
                 </div>
             </div>
 
