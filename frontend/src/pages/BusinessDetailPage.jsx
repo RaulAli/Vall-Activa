@@ -107,12 +107,23 @@ export default function BusinessDetailPage() {
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 blur-3xl -ml-32 -mb-32"></div>
 
                 <div className="relative">
-                    <div className="inline-block px-4 py-1.5 bg-indigo-500/20 rounded-full text-indigo-300 text-xs font-bold tracking-widest uppercase mb-4">
-                        {business.category || "Negocio Local"}
+                    <div className="flex flex-col items-center gap-6">
+                        {business.logo_url && (
+                            <img
+                                src={business.logo_url}
+                                alt={business.name}
+                                className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-indigo-500/30 object-cover shadow-2xl"
+                            />
+                        )}
+                        <div className="flex flex-col items-center">
+                            <div className="inline-block px-4 py-1.5 bg-indigo-500/20 rounded-full text-indigo-300 text-xs font-bold tracking-widest uppercase mb-4">
+                                {business.category || "Negocio Local"}
+                            </div>
+                            <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight">
+                                {business.name}
+                            </h1>
+                        </div>
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight">
-                        {business.name}
-                    </h1>
                     <div className="flex flex-wrap justify-center gap-4 text-slate-300 font-medium">
                         <span className="flex items-center gap-2">
                             📍 {business.city || business.region || "Ubicación disponible"}

@@ -18,6 +18,7 @@ export default function BusinessForm({ initialValues, onSubmit, submitting, subm
             phone: initialValues?.phone ?? "",
             website: initialValues?.website ?? "",
             instagram: initialValues?.instagram ?? "",
+            logo_url: initialValues?.logo_url ?? "",
         }),
         [initialValues, me]
     );
@@ -52,6 +53,7 @@ export default function BusinessForm({ initialValues, onSubmit, submitting, subm
             phone: values.phone.trim() || null,
             website: values.website.trim() || null,
             instagram: values.instagram.trim() || null,
+            logo_url: values.logo_url.trim() || null,
         });
     }
 
@@ -154,6 +156,13 @@ export default function BusinessForm({ initialValues, onSubmit, submitting, subm
                 <div>
                     <label className={labelClass}>Instagram</label>
                     <input className={inputClass} value={values.instagram} onChange={(e) => setField("instagram", e.target.value)} placeholder="@usuario" />
+                </div>
+                <div className="md:col-span-2">
+                    <label className={labelClass}>URL del Logotipo</label>
+                    <div className="flex gap-4 items-center">
+                        <input className={inputClass} value={values.logo_url} onChange={(e) => setField("logo_url", e.target.value)} placeholder="https://..." />
+                        {values.logo_url && <img src={values.logo_url} alt="Preview" className="w-12 h-12 rounded-full object-cover border border-slate-200" />}
+                    </div>
                 </div>
             </div>
 

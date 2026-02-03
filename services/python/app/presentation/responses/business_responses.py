@@ -14,6 +14,7 @@ class BusinessResponse(BaseModel):
     phone: str | None
     website: str | None
     instagram: str | None
+    logo_url: str | None
     status: str | None
     created_at: datetime
     updated_at: datetime

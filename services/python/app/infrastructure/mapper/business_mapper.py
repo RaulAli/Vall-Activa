@@ -14,6 +14,7 @@ def model_to_entity(m: BusinessModel) -> Business:
         website=m.website,
         instagram=m.instagram,
         address=getattr(m, "address", None),
+        logo_url=m.logo_url,
         status=None, # Will be filled by repository with extra join
         created_at=m.created_at,
         updated_at=m.updated_at,

@@ -110,7 +110,14 @@ export default function OfferDetailPage() {
         <div className="max-w-4xl mx-auto space-y-8 animate-in slide-in-from-bottom-4 duration-700">
             <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
                 <div className="relative h-64 bg-slate-900 flex items-center justify-center p-8 text-center overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20"></div>
+                    {offer.image_url ? (
+                        <div className="absolute top-0 left-0 w-full h-full">
+                            <img src={offer.image_url} alt="" className="w-full h-full object-cover opacity-40" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+                        </div>
+                    ) : (
+                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20"></div>
+                    )}
                     <div className="relative">
                         <div className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full text-white text-xs font-black uppercase tracking-widest mb-4">
                             Oferta Especial

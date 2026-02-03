@@ -16,5 +16,6 @@ class OfferResponse(BaseModel):
     terms: str | None
     vac_price: int
     stock_quantity: int
+    image_url: str | None
     created_at: datetime
     updated_at: datetime

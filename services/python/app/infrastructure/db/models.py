@@ -79,6 +79,7 @@ class BusinessModel(Base):
     phone: Mapped[str | None] = mapped_column(String(50), nullable=True)
     website: Mapped[str | None] = mapped_column(String(300), nullable=True)
     instagram: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    logo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
  
     owner_id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     owner = relationship("UserModel")
@@ -114,6 +115,7 @@ class OfferModel(Base):
 
     vac_price: Mapped[int] = mapped_column(sa.Integer(), nullable=False, default=500)
     stock_quantity: Mapped[int] = mapped_column(sa.Integer(), nullable=False, default=10)
+    image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)

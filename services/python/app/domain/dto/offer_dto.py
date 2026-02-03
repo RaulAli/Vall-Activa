@@ -15,6 +15,7 @@ class CreateOfferDTO:
     terms: str | None
     vac_price: int
     stock_quantity: int
+    image_url: str | None = None
 
 @dataclass(frozen=True)
 class UpdateOfferDTO:
@@ -28,3 +29,4 @@ class UpdateOfferDTO:
     terms: str | None = None
     vac_price: int | None = None
     stock_quantity: int | None = None
+    image_url: str | None = None

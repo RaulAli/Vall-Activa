@@ -25,6 +25,7 @@ export default function BusinessesTable({ items }) {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
                 <tr>
+                    <th align="left">Logo</th>
                     <th align="left">Nombre</th>
                     <th align="left">Categoría</th>
                     <th align="left">Región</th>
@@ -36,6 +37,15 @@ export default function BusinessesTable({ items }) {
             <tbody>
                 {items.map((b) => (
                     <tr key={b.id} style={{ borderTop: "1px solid #eee" }}>
+                        <td>
+                            {b.logo_url ? (
+                                <img src={b.logo_url} alt={b.name} style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover" }} />
+                            ) : (
+                                <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#eee", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem" }}>
+                                    🏢
+                                </div>
+                            )}
+                        </td>
                         <td>
                             <Link to={`/businesses/${b.id}`}>{b.name}</Link>
                         </td>

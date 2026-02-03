@@ -46,13 +46,24 @@ export default function ShopPage() {
                                     to={`/offers/${offer.id}`}
                                     className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:border-indigo-200 transition-all"
                                 >
-                                    <div className="h-32 bg-gradient-to-br from-indigo-500 to-purple-600 p-6 flex items-start justify-between">
-                                        <span className="px-3 py-1 bg-white/20 backdrop-blur-md text-white text-xs font-bold rounded-full uppercase tracking-wider">
-                                            {offer.category || "General"}
-                                        </span>
-                                        <div className="text-white text-right">
-                                            <p className="text-2xl font-black">{offer.discount_value}</p>
-                                            <p className="text-[10px] uppercase opacity-80">{offer.discount_type}</p>
+                                    <div className="relative h-40 overflow-hidden">
+                                        {offer.image_url ? (
+                                            <>
+                                                <img src={offer.image_url} alt="" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                                            </>
+                                        ) : (
+                                            <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600"></div>
+                                        )}
+                                        <div className="absolute top-4 left-4">
+                                            <span className="px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-black rounded-full uppercase tracking-wider border border-white/10">
+                                                {offer.category || "General"}
+                                            </span>
+                                        </div>
+                                        <div className="absolute top-4 right-4 text-white text-right drop-shadow-lg">
+                                            <p className="text-2xl font-black">
+                                                {offer.discount_type === 'PERCENTAGE' ? '🏷️' : '💸'} {offer.discount_value}
+                                            </p>
                                         </div>
                                     </div>
                                     <div className="p-6">
@@ -90,8 +101,17 @@ export default function ShopPage() {
                                     to={`/businesses/${b.id}`}
                                     className="block p-6 bg-white rounded-2xl border border-slate-200 hover:shadow-lg hover:border-indigo-100 transition-all text-center"
                                 >
-                                    <div className="w-16 h-16 bg-slate-100 rounded-2xl mx-auto flex items-center justify-center text-3xl mb-4 group-hover:bg-indigo-50 transition-colors">
-                                        🏢
+                                    <div className="w-20 h-20 bg-slate-50 rounded-full mx-auto flex items-center justify-center text-3xl mb-4 group-hover:bg-indigo-50 transition-all border-4 border-slate-100 overflow-hidden shadow-sm group-hover:shadow-md">
+                                        {b.logo_url ? (
+                                            <img src={b.logo_url} alt={b.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <span>
+                                                {b.category?.toLowerCase() === 'restaurante' ? '🍴' :
+                                                    b.category?.toLowerCase() === 'tienda' ? '🛍️' :
+                                                        b.category?.toLowerCase() === 'deporte' ? '🏃' :
+                                                            '🏢'}
+                                            </span>
+                                        )}
                                     </div>
                                     <h3 className="font-bold text-slate-900">{b.name}</h3>
                                     <p className="text-xs text-slate-400 mt-1">{b.city}, {b.region}</p>

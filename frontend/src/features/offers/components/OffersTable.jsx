@@ -8,6 +8,7 @@ export default function OffersTable({ items }) {
             <table className="w-full text-left">
                 <thead>
                     <tr className="text-slate-400 text-xs uppercase tracking-wider">
+                        <th className="px-4 py-3 font-semibold">Imagen</th>
                         <th className="px-4 py-3 font-semibold">Oferta</th>
                         <th className="px-4 py-3 font-semibold">Negocio</th>
                         <th className="px-4 py-3 font-semibold">Fechas</th>
@@ -19,6 +20,15 @@ export default function OffersTable({ items }) {
                 <tbody className="divide-y divide-slate-100">
                     {items.map((o) => (
                         <tr key={o.id} className="hover:bg-slate-50 transition-colors group">
+                            <td className="px-4 py-4">
+                                {o.image_url ? (
+                                    <img src={o.image_url} alt={o.title} className="w-12 h-12 rounded-lg object-cover shadow-sm" />
+                                ) : (
+                                    <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-xl text-slate-300">
+                                        🎁
+                                    </div>
+                                )}
+                            </td>
                             <td className="px-4 py-4">
                                 <Link to={`/offers/${o.id}`} className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
                                     {o.title}

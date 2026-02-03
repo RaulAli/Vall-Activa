@@ -29,6 +29,7 @@ class SqlAlchemyOfferRepository(OfferRepository):
             terms=data.terms,
             vac_price=data.vac_price,
             stock_quantity=data.stock_quantity,
+            image_url=data.image_url,
         )
         self._session.add(m)
         await self._session.commit()

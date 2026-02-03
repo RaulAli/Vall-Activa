@@ -26,6 +26,7 @@ class SqlAlchemyBusinessRepository(BusinessRepository):
             phone=data.phone,
             website=data.website,
             instagram=data.instagram,
+            logo_url=data.logo_url,
         )
         self._session.add(m)
         await self._session.commit()

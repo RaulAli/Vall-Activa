@@ -15,6 +15,7 @@ def model_to_entity(m: OfferModel, business_name: str | None = None) -> Offer:
         terms=m.terms,
         vac_price=m.vac_price,
         stock_quantity=m.stock_quantity,
+        image_url=m.image_url,
         created_at=m.created_at,
         updated_at=m.updated_at,
         business_name=business_name,

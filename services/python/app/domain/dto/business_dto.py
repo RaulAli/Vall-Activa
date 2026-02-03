@@ -13,6 +13,7 @@ class CreateBusinessDTO:
     phone: str | None
     website: str | None
     instagram: str | None
+    logo_url: str | None = None
 
 @dataclass(frozen=True)
 class UpdateBusinessDTO:
@@ -25,3 +26,4 @@ class UpdateBusinessDTO:
     phone: str | None = None
     website: str | None = None
     instagram: str | None = None
+    logo_url: str | None = None

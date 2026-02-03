@@ -16,6 +16,7 @@ export default function OfferForm({ initialValues, onSubmit, submitting, submitT
             terms: initialValues?.terms ?? "",
             vac_price: initialValues?.vac_price ?? 500,
             stock_quantity: initialValues?.stock_quantity ?? 10,
+            image_url: initialValues?.image_url ?? "",
         }),
         [initialValues]
     );
@@ -56,6 +57,7 @@ export default function OfferForm({ initialValues, onSubmit, submitting, submitT
             terms: values.terms.trim() || null,
             vac_price: parseInt(values.vac_price) || 0,
             stock_quantity: parseInt(values.stock_quantity) || 0,
+            image_url: values.image_url.trim() || null,
         });
     }
 
@@ -90,6 +92,19 @@ export default function OfferForm({ initialValues, onSubmit, submitting, submitT
                         placeholder="Ej: 20% de descuento en calzado"
                     />
                     {touched.title && errors.title && <p className={errorClass}>{errors.title}</p>}
+                </div>
+
+                <div className="md:col-span-2">
+                    <label className={labelClass}>URL de la Imagen</label>
+                    <div className="flex gap-4 items-center">
+                        <input
+                            className={inputClass}
+                            value={values.image_url}
+                            onChange={(e) => setField("image_url", e.target.value)}
+                            placeholder="https://..."
+                        />
+                        {values.image_url && <img src={values.image_url} alt="Preview" className="w-16 h-12 rounded-lg object-cover border border-slate-200" />}
+                    </div>
                 </div>
 
                 <div>
