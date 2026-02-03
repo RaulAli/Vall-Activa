@@ -32,3 +32,8 @@ class RegisterAdminDTO:
 class LoginDTO:
     email: str
     password: str
+
+@dataclass(frozen=True)
+class UpdateUserDTO:
+    email: str | None = None
+    password: str | None = None

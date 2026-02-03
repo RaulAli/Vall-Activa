@@ -91,4 +91,17 @@ class AuthService:
         if not user.is_active:
             raise ValueError("User is inactive")
 
+
         return self._token(user), user.role
+
+    async def update_user(self, user_id: UUID, data: "UpdateUserDTO") -> User | None:
+        email = data.email
+        password_hash = self._hash(data.password) if data.password else None
+        
+        # If email is changing, check for duplicates
+        if email:
+            existing = await self._users.get_by_email(email)
+            if existing and existing.id != user_id:
+                raise ValueError("Email already in use")
+        
+        return await self._users.update(user_id, email, password_hash)

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.presentation.requests.auth_requests import (
-    RegisterAthleteRequest, RegisterBusinessRequest, RegisterAdminRequest, LoginRequest
+    RegisterAthleteRequest, RegisterBusinessRequest, RegisterAdminRequest, LoginRequest, UpdateUserRequest
 )
 from app.presentation.responses.auth_responses import TokenResponse, UserResponse
 from app.application.service.auth_service import AuthService
@@ -53,3 +53,15 @@ async def login(req: LoginRequest, svc: AuthService = Depends(get_auth_service),
 @router.get("/me", response_model=UserResponse)
 async def get_me(actor=Depends(get_actor_dep)):
     return UserResponse(id=actor.user_id, email=actor.email, role=actor.role)
+
+@router.patch("/profile", response_model=UserResponse)
+async def update_profile(req: UpdateUserRequest, svc: AuthService = Depends(get_auth_service), actor=Depends(get_actor_dep)):
+    try:
+        from app.domain.dto.auth_dto import UpdateUserDTO
+        dto = UpdateUserDTO(**req.model_dump(exclude_unset=True))
+        updated = await svc.update_user(actor.user_id, dto)
+        if not updated:
+            raise HTTPException(status_code=404, detail="User not found")
+        return UserResponse(id=updated.id, email=updated.email, role=updated.role)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

@@ -29,3 +29,14 @@ export async function me(token) {
         headers: { Authorization: `Bearer ${token}` },
     });
 }
+
+export async function updateProfile(payload, token) {
+    return http(`/auth/profile`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(payload),
+    });
+}

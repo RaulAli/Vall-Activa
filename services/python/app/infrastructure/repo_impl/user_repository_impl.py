@@ -34,4 +34,18 @@ class SqlAlchemyUserRepository(UserRepository):
         await self._session.commit()
         await self._session.refresh(m)
         return model_to_entity(m)
+
+    async def update(self, user_id: UUID, email: str | None = None, password_hash: str | None = None) -> User | None:
+        m = await self._session.get(UserModel, user_id)
+        if not m:
+            return None
+        
+        if email is not None:
+            m.email = email
+        if password_hash is not None:
+            m.password_hash = password_hash
+            
+        await self._session.commit()
+        await self._session.refresh(m)
+        return model_to_entity(m)
     

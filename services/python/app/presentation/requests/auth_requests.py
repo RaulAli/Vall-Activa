@@ -27,3 +27,7 @@ class RegisterAdminRequest(BaseModel):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+
+class UpdateUserRequest(BaseModel):
+    email: EmailStr | None = None
+    password: str | None = Field(None, min_length=6)

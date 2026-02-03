@@ -56,12 +56,20 @@ export default function AthleteDashboard() {
                     <h1 className="text-3xl font-extrabold text-slate-900">Hola, {me?.email?.split('@')[0] || "Atleta"}</h1>
                     <p className="text-slate-500 mt-1">Este es tu panel personal de actividades.</p>
                 </div>
-                <button
-                    onClick={() => navigate("/routes/new")}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-100 transition-all"
-                >
-                    + Nueva Ruta
-                </button>
+                <div className="flex gap-3">
+                    <button
+                        onClick={() => navigate("/athlete/profile")}
+                        className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-6 py-3 rounded-xl font-bold transition-all"
+                    >
+                        Mi Perfil
+                    </button>
+                    <button
+                        onClick={() => navigate("/routes/new")}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-100 transition-all"
+                    >
+                        + Nueva Ruta
+                    </button>
+                </div>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

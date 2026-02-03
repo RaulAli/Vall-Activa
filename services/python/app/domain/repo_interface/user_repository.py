@@ -11,3 +11,6 @@ class UserRepository(ABC):
 
     @abstractmethod
     async def create(self, email: str, password_hash: str, role: str) -> User: ...
+
+    @abstractmethod
+    async def update(self, user_id: UUID, email: str | None = None, password_hash: str | None = None) -> User | None: ...

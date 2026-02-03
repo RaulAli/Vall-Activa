@@ -3,12 +3,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useBusiness } from "../features/businesses/hooks/useBusiness";
 import BusinessForm from "../features/businesses/components/BusinessForm";
 import { useBusinessMutations } from "../features/businesses/hooks/useBusinessMutations";
+import { updateProfile } from "../services/authApi";
+import { useSession } from "../features/auth/hooks/useSession";
 
 export default function BusinessEditPage() {
     const { id } = useParams();
     const nav = useNavigate();
     const { data, loading, error } = useBusiness(id);
     const { updateBusiness } = useBusinessMutations();
+    const { me, setSession, session } = useSession();
 
     const [submitting, setSubmitting] = useState(false);
     const [saveError, setSaveError] = useState(null);
@@ -17,7 +20,20 @@ export default function BusinessEditPage() {
         setSubmitting(true);
         setSaveError(null);
         try {
-            const updated = await updateBusiness(id, payload);
+            const { email, password, ...businessPayload } = payload;
+
+            if (email !== me.email || password) {
+                const userUpdate = {};
+                if (email !== me.email) userUpdate.email = email;
+                if (password) userUpdate.password = password;
+
+                const updatedUser = await updateProfile(userUpdate, session.token);
+                if (email !== me.email) {
+                    setSession({ ...session, me: { ...me, email: updatedUser.email } });
+                }
+            }
+
+            const updated = await updateBusiness(id, businessPayload);
             nav(`/businesses/${updated.id}`);
         } catch (e) {
             setSaveError(e);
