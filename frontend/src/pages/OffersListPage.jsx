@@ -62,7 +62,7 @@ export default function OffersListPage() {
         <div style={{ padding: 16, display: "grid", gap: 12 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <h2>Ofertas</h2>
-                <Link to="/offers/new">+ Nueva oferta</Link>
+                {/* <Link to="/offers/new">+ Nueva oferta</Link> */}
             </div>
 
             <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(3, 1fr)" }}>

@@ -45,7 +45,7 @@ export default function BusinessesListPage() {
         <div style={{ padding: 16, display: "grid", gap: 12 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <h2>Negocios</h2>
-                <Link to="/businesses/new">+ Nuevo negocio</Link>
+                {/* <Link to="/businesses/new">+ Nuevo negocio</Link> */}
             </div>
 
             <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(4, 1fr)" }}>

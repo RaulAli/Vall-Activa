@@ -55,7 +55,7 @@ class SqlAlchemyRouteRepository(RouteRepository):
         if dist_prev < 10 and dist_total >= 10: mission_earned += 50
         if dist_prev < 25 and dist_total >= 25: mission_earned += 125
         
-        return int(base_earned + bonus_earned + mission_earned)
+        return round(base_earned + bonus_earned + mission_earned)
 
     async def create(self, data: CreateRouteDTO) -> Route:
         vac_points = await self._calculate_vac_points(data.user_id, data.date, data.distance_km)
